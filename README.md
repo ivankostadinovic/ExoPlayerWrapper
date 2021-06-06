@@ -1,11 +1,11 @@
 # ExoPlayerWrapper
 A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper.
 
-# Download
 
+
+## Download
 This library is available in **jitPack** which is the default Maven repository used in Android Studio.
 
-## Gradle 
 **Step 1.** Add it in your root build.gradle at the end of repositories
 ```Gradle
 allprojects 
@@ -25,7 +25,6 @@ dependencies {
 ```
 
 # Usage
-
 
 ## Playback without video
 ```java
