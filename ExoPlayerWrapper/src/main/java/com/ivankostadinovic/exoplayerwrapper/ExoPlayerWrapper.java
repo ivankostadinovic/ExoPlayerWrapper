@@ -21,9 +21,11 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -55,6 +57,9 @@ import static com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFE
 import static com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MIN_BUFFER_MS;
 import static com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES;
 
+/**
+ * An {@link ExoPlayer} implementation. Instances can be obtained from {@link ExoPlayerWrapper.Builder}.
+ */
 public class ExoPlayerWrapper implements LifecycleObserver {
     public FragmentActivity ctx;
     public SimpleExoPlayer player;
@@ -194,7 +199,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
             .Builder(ctx, defaultRenderersFactory)
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
-            .setReleaseTimeoutMs(5000)
+            .setReleaseTimeoutMs(5000) //sometimes releasing player takes a bit longer and would cause errors in the background
             .build();
 
         if (playerView != null) {
