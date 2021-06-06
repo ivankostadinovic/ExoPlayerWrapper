@@ -49,7 +49,7 @@ A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) w
             .build();
 ```
 
-###Track selection and preferred language
+### Track selection and preferred language
 If you wish to add track selection and/or a preferred audio/subtitle language, pass the views and the preferred language to the library.
 ```
         View buttonSelectAudioTrack, buttonSelectVideoTrack, buttonSelectSubtitleTrack;
@@ -63,7 +63,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
             .build();
 ```
 
-###Enable extension rendering
+### Enable extension rendering
 ```
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
