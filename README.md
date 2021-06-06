@@ -51,7 +51,7 @@ dependencies {
 ```java
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
             .setHandleLifecycleEvents(true, this)   //default is false
-            .setListener(new Player.Listener() {
+            .setListener(new Player.Listener() {  //you can override any Player.Listener function here
                 @Override
                 public void onIsPlayingChanged(boolean isPlaying) {
 
