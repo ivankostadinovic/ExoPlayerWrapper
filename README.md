@@ -20,7 +20,7 @@ allprojects
 **Step 2.** Add the dependency in your apps module build.gradle
 ```Gradle
 dependencies {
-	        implementation 'com.github.ivankostadinovic:ExoPlayerWrapper:1.0.1'
+	        implementation 'com.github.ivankostadinovic:ExoPlayerWrapper:0.5.0'
 }
 ```
 
