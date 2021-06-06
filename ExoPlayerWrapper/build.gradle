@@ -30,18 +30,14 @@ def exoPlayerVersion = '2.14.0'
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.3.0'
-    implementation 'com.google.android.material:material:1.3.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    implementation "com.google.android.exoplayer:exoplayer-common:$exoPlayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-dash:$exoPlayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-ui:$exoPlayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:$exoPlayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-dash:$exoPlayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-hls:$exoPlayerVersion"
-    implementation "com.google.android.exoplayer:exoplayer-rtsp:$exoPlayerVersion"
-    implementation 'com.jakewharton.timber:timber:4.7.1'
+    api "com.google.android.exoplayer:exoplayer-common:$exoPlayerVersion"
+    api "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
+    api "com.google.android.exoplayer:exoplayer-dash:$exoPlayerVersion"
+    api "com.google.android.exoplayer:exoplayer-ui:$exoPlayerVersion"
+    api "com.google.android.exoplayer:exoplayer-smoothstreaming:$exoPlayerVersion"
+    api "com.google.android.exoplayer:exoplayer-dash:$exoPlayerVersion"
+    api "com.google.android.exoplayer:exoplayer-hls:$exoPlayerVersion"
+    api "com.google.android.exoplayer:exoplayer-rtsp:$exoPlayerVersion"
+    api 'com.jakewharton.timber:timber:4.7.1'
 }

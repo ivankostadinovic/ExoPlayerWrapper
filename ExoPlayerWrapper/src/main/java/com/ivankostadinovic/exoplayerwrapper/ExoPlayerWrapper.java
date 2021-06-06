@@ -9,7 +9,6 @@ import android.net.NetworkRequest;
 import android.net.Uri;
 import android.view.View;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -69,7 +68,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     public boolean wasPlaying = true, noInternetErrorShowing;
 
     @Nullable
-    public Runnable internetReturnedRunnable, noInternetRunnable;
+    private ConnectionListener connectionListener;
 
     @Nullable
     public View btnSelectAudioTrack, btnSelectVideoTrack, btnSelectSubtitleTrack;
@@ -105,8 +104,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
                              int extensionRendererMode,
                              @Nullable PlayerView playerView,
                              @Nullable Player.Listener listener,
-                             @Nullable Runnable noInternetRunnable,
-                             @Nullable Runnable internetReturnedRunnable,
+                             @Nullable ConnectionListener connectionListener,
                              @Nullable String preferredTrackLanguage,
                              @Nullable View btnSelectAudioTrack,
                              @Nullable View btnSelectVideoTrack,
@@ -117,24 +115,23 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         }
 
         if (btnSelectAudioTrack != null) {
-            btnSelectAudioTrack.setOnClickListener(v -> onAudioClick(ctx));
+            btnSelectAudioTrack.setOnClickListener(v -> onSelectAudioTrackCLick(ctx));
         }
 
         if (btnSelectVideoTrack != null) {
-            btnSelectVideoTrack.setOnClickListener(v -> onVideoClick(ctx));
+            btnSelectVideoTrack.setOnClickListener(v -> onSelectVideoTrackClick(ctx));
         }
 
         if (btnSelectSubtitleTrack != null) {
-            btnSelectSubtitleTrack.setOnClickListener(v -> onSubtitleClick(ctx));
+            btnSelectSubtitleTrack.setOnClickListener(v -> onSelectSubtitleTrackClick(ctx));
         }
 
         this.btnSelectAudioTrack = btnSelectAudioTrack;
         this.btnSelectSubtitleTrack = btnSelectSubtitleTrack;
         this.btnSelectVideoTrack = btnSelectVideoTrack;
         this.playerView = playerView;
-        this.internetReturnedRunnable = internetReturnedRunnable;
-        this.noInternetRunnable = noInternetRunnable;
         this.ctx = ctx;
+        this.connectionListener = connectionListener;
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
             ctx,
@@ -156,7 +153,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
             @Override
             public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
                 if (!handleInternetError()) {
-                    return 1000;
+                    return 1000;   // if there is a connection error continue reloading the media
                 }
                 return C.TIME_UNSET;
             }
@@ -226,26 +223,26 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         setUpInternetListener();
     }
 
-    public boolean handleInternetError() {
+    private boolean handleInternetError() {
         try {
-            if (checkInternetConnection()) {
+            if (isNetworkAvailable()) {
                 return true;
             } else {
                 ctx.runOnUiThread(() -> {
-                    if (noInternetRunnable != null && player.getPlaybackState() != Player.STATE_READY) {
+                    if (connectionListener != null && player.getPlaybackState() != Player.STATE_READY) {
                         noInternetErrorShowing = true;
-                        noInternetRunnable.run();
+                        connectionListener.onConnectionError();
                     }
                 });
                 return false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Timber.d(e);
             return false;
         }
     }
 
-    private boolean checkInternetConnection() {
+    private boolean isNetworkAvailable() {
         NetworkInfo activeNetworkInfo = ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
@@ -260,8 +257,8 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         networkCallback = new ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(@NonNull Network network) {
-                if (internetReturnedRunnable != null) {
-                    internetReturnedRunnable.run();
+                if (connectionListener != null) {
+                    connectionListener.onConnectionReturned();
                 }
                 super.onAvailable(network);
             }
@@ -279,23 +276,14 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         }
     }
 
-    public void release() {
-        if (player != null) {
-            player.release();
+    public void onStart() {
+        if (player == null) {
+            return;
         }
-        player = null;
-        btnSelectSubtitleTrack = null;
-        btnSelectAudioTrack = null;
-        btnSelectVideoTrack = null;
+        player.setPlayWhenReady(wasPlaying);
         if (playerView != null) {
-            playerView.onPause();
-            playerView.setPlayer(null);
+            playerView.onResume();
         }
-        playerView = null;
-        unregisterNetworkCallback();
-        connectivityManager = null;
-        networkCallback = null;
-        networkRequest = null;
     }
 
     public void onStop() {
@@ -306,47 +294,61 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         if (player.getPlayWhenReady()) {
             player.setPlayWhenReady(false);
         }
-    }
-
-    public void onStart() {
-        if (player == null) {
-            return;
+        if (playerView != null) {
+            playerView.onPause();
         }
-        player.setPlayWhenReady(wasPlaying);
     }
 
-    public void onSubtitleClick(Context ctx) {
+    public void release() {
+        if (player != null) {
+            player.release();
+        }
+        player = null;
+        btnSelectSubtitleTrack = null;
+        btnSelectAudioTrack = null;
+        btnSelectVideoTrack = null;
+        if (playerView != null) {
+            playerView.setPlayer(null);
+        }
+        playerView = null;
+        unregisterNetworkCallback();
+        connectivityManager = null;
+        networkCallback = null;
+        networkRequest = null;
+    }
+
+    public void onSelectSubtitleTrackClick(Context ctx) {
         try {
-            new TrackSelectionDialogBuilder(ctx, "Select subtitles", trackSelector, getRendererIndex(C.TRACK_TYPE_TEXT))
+            new TrackSelectionDialogBuilder(ctx, ctx.getString(R.string.select_subtitle_track), trackSelector, getRendererIndex(C.TRACK_TYPE_TEXT))
                 .setTheme(R.style.DialogTheme)
                 .setShowDisableOption(true)
                 .build()
                 .show();
         } catch (Exception e) {
-            Timber.d("No tracks available");
+            Timber.d(e);
         }
     }
 
-    public void onVideoClick(Context ctx) {
+    public void onSelectVideoTrackClick(Context ctx) {
         try {
-            new TrackSelectionDialogBuilder(ctx, ctx.getString(R.string.select_subtitles), trackSelector, getRendererIndex(C.TRACK_TYPE_VIDEO))
+            new TrackSelectionDialogBuilder(ctx, ctx.getString(R.string.select_video_track), trackSelector, getRendererIndex(C.TRACK_TYPE_VIDEO))
                 .setTheme(R.style.DialogTheme)
                 .setShowDisableOption(true)
                 .build()
                 .show();
         } catch (Exception e) {
-            Timber.d("No tracks available");
+            Timber.d(e);
         }
     }
 
-    public void onAudioClick(Context ctx) {
+    public void onSelectAudioTrackCLick(Context ctx) {
         try {
             new TrackSelectionDialogBuilder(ctx, ctx.getString(R.string.select_audio_track), trackSelector, getRendererIndex(C.TRACK_TYPE_AUDIO))
                 .setTheme(R.style.DialogTheme)
                 .build()
                 .show();
         } catch (Exception e) {
-            Timber.d("No tracks available");
+            Timber.d(e);
         }
     }
 
@@ -364,6 +366,10 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         return -1;
     }
 
+
+    /**
+     * @param uri play Media from the given Uri
+     */
     public void playMedia(Uri uri) {
         Timber.d("media url %s", uri);
         currentMediaSource = getMediaSource(uri);
@@ -372,6 +378,18 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         player.setPlayWhenReady(true);
     }
 
+    /**
+     * Play media from the given url
+     *
+     * @param url
+     */
+    public void playMedia(String url) {
+        playMedia(Uri.parse(url));
+    }
+
+    /**
+     * Reload the currently playing media
+     */
     public void reloadCurrentMedia() {
         player.setMediaSource(currentMediaSource);
         player.prepare();
@@ -421,41 +439,76 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         private Player.Listener listener;
         private String preferredTrackLanguage;
         private View btnSelectAudioTrack, btnSelectVideoTrack, btnSelectSubtitleTrack;
-        private final PlayerView playerView;
+        private PlayerView playerView;
         private boolean handleLifecycleEvents;
         private LifecycleOwner lifecycleOwner;
-        private Runnable noInternetRunnable, internetReturnedRunnable;
+        private ConnectionListener connectionListener;
 
+        /**
+         * @param ctx Context that will be used to initialize the player
+         */
+        public Builder(@NonNull FragmentActivity ctx) {
+            this.ctx = ctx;
+        }
+
+        /**
+         * @param ctx        Context that will be used with the player
+         * @param playerView PlayerView for which the player will be bound to
+         */
         public Builder(@NonNull FragmentActivity ctx,
                        @Nullable PlayerView playerView) {
             this.ctx = ctx;
             this.playerView = playerView;
         }
 
-        public Builder setExtensionRendererMode(int extensionRendererMode) {
+        /**
+         * @param extensionRendererMode extension renderer mode
+         * @return builder, for convenience
+         */
+        public Builder setExtensionRendererMode(@DefaultRenderersFactory.ExtensionRendererMode int extensionRendererMode) {
             this.extensionRendererMode = extensionRendererMode;
             return this;
         }
 
+        /**
+         * @param listener for player events
+         * @return builder, for convenience
+         */
         public Builder setListener(@Nullable Player.Listener listener) {
             this.listener = listener;
             return this;
         }
 
-        public Builder setPreferredTrackLanguage(@Nullable String language) {
-            this.preferredTrackLanguage = language;
+        /**
+         * @param preferredTrackLanguage preferred audio/subtitle track language
+         * @return builder, for convenience
+         */
+        public Builder setPreferredTrackLanguage(@Nullable String preferredTrackLanguage) {
+            this.preferredTrackLanguage = preferredTrackLanguage;
             return this;
         }
 
-        public Builder setTrackSelectionButtons(@Nullable View audio,
-                                                @Nullable View video,
-                                                @Nullable View subtitle) {
-            btnSelectAudioTrack = audio;
-            btnSelectVideoTrack = video;
-            btnSelectSubtitleTrack = subtitle;
+
+        /**
+         * @param btnAudio    a View which when clicked will show audio tracks dialog
+         * @param btnVideo    a View which when clicked will show video tracks dialog
+         * @param btnSubtitle a View which when clicked will show subtitle tracks dialog
+         * @return builder, for convenience
+         */
+        public Builder setTrackSelectionButtons(@Nullable View btnAudio,
+                                                @Nullable View btnVideo,
+                                                @Nullable View btnSubtitle) {
+            btnSelectAudioTrack = btnAudio;
+            btnSelectVideoTrack = btnVideo;
+            btnSelectSubtitleTrack = btnSubtitle;
             return this;
         }
 
+        /**
+         * @param handleLifecycleEvents to automatically start, pause and release the player resources on lifecycle events
+         * @param lifecycleOwner        lifecycle owner to which the player will be bound to
+         * @return builder, for convenience
+         */
         public Builder setHandleLifecycleEvents(boolean handleLifecycleEvents,
                                                 @NonNull LifecycleOwner lifecycleOwner) {
             this.lifecycleOwner = lifecycleOwner;
@@ -463,10 +516,12 @@ public class ExoPlayerWrapper implements LifecycleObserver {
             return this;
         }
 
-        public Builder setInternetListeners(@Nullable Runnable noInternetRunnable,
-                                            @Nullable Runnable internetReturnedRunnable) {
-            this.noInternetRunnable = noInternetRunnable;
-            this.internetReturnedRunnable = internetReturnedRunnable;
+        /**
+         * @param connectionListener callbacks for connection errors and connection returns
+         * @return builder, for convenience
+         */
+        public Builder setConnectionListener(@Nullable ConnectionListener connectionListener) {
+            this.connectionListener = connectionListener;
             return this;
         }
 
@@ -478,13 +533,18 @@ public class ExoPlayerWrapper implements LifecycleObserver {
                 extensionRendererMode,
                 playerView,
                 listener,
-                noInternetRunnable,
-                internetReturnedRunnable,
+                connectionListener,
                 preferredTrackLanguage,
                 btnSelectAudioTrack,
                 btnSelectVideoTrack,
                 btnSelectSubtitleTrack);
         }
+    }
+
+    public interface ConnectionListener {
+        void onConnectionError();
+
+        void onConnectionReturned();
     }
 
     private class ExoPlayerWrapperEventListener implements Player.Listener {
@@ -502,8 +562,8 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         public void onPlaybackStateChanged(int state) {
             if (state == Player.STATE_READY && noInternetErrorShowing) {
                 noInternetErrorShowing = false;
-                if (internetReturnedRunnable != null) {
-                    internetReturnedRunnable.run();
+                if (connectionListener != null) {
+                    connectionListener.onConnectionReturned();
                 }
             }
         }
