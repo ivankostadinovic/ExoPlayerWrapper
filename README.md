@@ -9,12 +9,12 @@ This library is available in **jitPack** which is the default Maven repository u
 **Step 1.** Add it in your root build.gradle at the end of repositories
 ```Gradle
 allprojects 
-{
-	repositories {
-		...
-		maven { url 'https://jitpack.io' }
-	}
-}
+    {
+        repositories {
+            ...
+            maven { url 'https://jitpack.io' }
+        }
+    }
 ```
 
 **Step 2.** Add the dependency in your apps module build.gradle
