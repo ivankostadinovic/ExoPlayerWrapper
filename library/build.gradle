@@ -36,3 +36,16 @@ dependencies {
     api "com.google.android.exoplayer:exoplayer-rtsp:$exoPlayerVersion"
     api 'com.jakewharton.timber:timber:4.7.1'
 }
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.github.ivankostadinovic'
+                artifactId = 'ExoPlayerWrapper'
+                version = '1.0'
+            }
+        }
+    }
+}
