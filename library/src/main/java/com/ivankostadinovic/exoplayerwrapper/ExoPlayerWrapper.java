@@ -151,6 +151,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         trackSelector = new DefaultTrackSelector(ctx);
         trackSelector.setParameters(trackSelector
             .buildUponParameters()
+            .setPreferredAudioLanguage(preferredTrackLanguage)
             .setPreferredTextLanguage(preferredTrackLanguage));
 
 
@@ -446,7 +447,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         private PlayerView playerView;
         private ConnectionListener connectionListener;
         private LifecycleOwner lifecycleOwner;
-        private boolean handleLifecycleEvents = true;
+        private boolean handleLifecycleEvents;
         private int extensionRendererMode = DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
 
         /**
@@ -485,7 +486,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         }
 
         /**
-         * @param preferredTrackLanguage preferred audio/subtitle track language
+         * @param preferredTrackLanguage Preferred audio language as an IETF BCP 47 conformant tag
          * @return builder, for convenience
          */
         public Builder setPreferredTrackLanguage(@Nullable String preferredTrackLanguage) {
