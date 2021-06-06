@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="dialog_accent">@android:color/holo_blue_bright</color>
+    <color name="dialog_primary">@android:color/holo_blue_bright</color>
+    <color name="dialog_background">#7b7b7b</color>
+    <color name="subtitle_color">@android:color/white</color>
+</resources>
