@@ -365,7 +365,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     }
 
     public void playMedia(Uri uri) {
-        Timber.d("media url " + uri);
+        Timber.d("media url %s", uri);
         currentMediaSource = getMediaSource(uri);
         player.setMediaSource(currentMediaSource);
         player.prepare();
