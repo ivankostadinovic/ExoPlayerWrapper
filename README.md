@@ -37,13 +37,12 @@ A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) w
             .setConnectionListener(new ExoPlayerWrapper.ConnectionListener() {
                 @Override
                 public void onConnectionError() {
-                    hideNoInternetError();
+                    showNoInternetError(); // your function to show to the user that there is an internet issue
                 }
 
                 @Override
                 public void onConnectionReturned() {
-                    showNoInternetError();
-
+                    hideNoInternetError(); //your function to show to the user that the internet connection returned
                 }
             })
             .build();
