@@ -1,3 +1,2 @@
 rootProject.name = "ExoPlayerWrapper"
-include ':app'
 include ':ExoPlayerWrapper'
