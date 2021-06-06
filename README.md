@@ -59,7 +59,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
 
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
             .setTrackSelectionButtons(buttonSelectAudioTrack, buttonSelectVideoTrack, buttonSelectSubtitleTrack)
-            .setPreferredTrackLanguage("en") //default isn't set
+            .setPreferredTrackLanguage("en") //default isn't set, IETF BCP 47 conformant tag
             .build();
 ```
 
