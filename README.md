@@ -1,5 +1,5 @@
 # ExoPlayerWrapper
-A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper.
+A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper. EventLogger is added by default for the debug build type.
 
 
 
