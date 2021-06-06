@@ -439,15 +439,15 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     }
 
     public static class Builder {
-        private final FragmentActivity ctx;
-        private int extensionRendererMode;
+        private FragmentActivity ctx;
         private Player.Listener listener;
         private String preferredTrackLanguage;
         private View btnSelectAudioTrack, btnSelectVideoTrack, btnSelectSubtitleTrack;
         private PlayerView playerView;
-        private boolean handleLifecycleEvents;
-        private LifecycleOwner lifecycleOwner;
         private ConnectionListener connectionListener;
+        private LifecycleOwner lifecycleOwner;
+        private boolean handleLifecycleEvents = true;
+        private int extensionRendererMode = DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
 
         /**
          * @param ctx Context that will be used to initialize the player
