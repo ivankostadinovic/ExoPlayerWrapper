@@ -4,7 +4,7 @@ A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) w
 ## Usage
 
 ### Playback without video
-```
+```java
         String mediaUrl = "...";
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
             .build();
@@ -13,7 +13,7 @@ A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) w
 ```
 
 ### Playback with video
-```
+```java
         String mediaUrl = "...";
         
         PlayerView playerView = findViewById(R.id.player_view);
@@ -25,7 +25,7 @@ A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) w
 
 ### Observing player, lifecycle and internet connection events
 
-```
+```java
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
             .setHandleLifecycleEvents(true, this)   //default is false
             .setListener(new Player.Listener() {
@@ -51,7 +51,7 @@ A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) w
 
 ### Track selection and preferred language
 If you wish to add track selection and/or a preferred audio/subtitle language, pass the views and the preferred language to the library.
-```
+```java
         View buttonSelectAudioTrack, buttonSelectVideoTrack, buttonSelectSubtitleTrack;
         buttonSelectAudioTrack = findViewById(R.id.btn_audio); //a view which when clicked will open audio track selection dialog
         buttonSelectVideoTrack = findViewById(R.id.btn_video; //a view which when clicked will open video track selection dialog
@@ -64,7 +64,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
 ```
 
 ### Enable extension rendering
-```
+```java
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
             .build();
