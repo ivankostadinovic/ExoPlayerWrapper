@@ -7,6 +7,8 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -25,7 +27,6 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -61,7 +62,7 @@ import static com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderF
  * An {@link ExoPlayer} implementation. Instances can be obtained from {@link ExoPlayerWrapper.Builder}.
  */
 public class ExoPlayerWrapper implements LifecycleObserver {
-    public FragmentActivity ctx;
+    public Context ctx;
     public SimpleExoPlayer player;
     public HlsMediaSource.Factory hlsFactory;
     public DashMediaSource.Factory dashFactory;
@@ -103,7 +104,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         ExoPlayerWrapper.this.release();
     }
 
-    private ExoPlayerWrapper(@NonNull FragmentActivity ctx,
+    private ExoPlayerWrapper(@NonNull Context ctx,
                              boolean loggingEnabled,
                              boolean handleLifecycleEvents,
                              @NonNull LifecycleOwner lifecycleOwner,
@@ -235,7 +236,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
             if (isNetworkAvailable()) {
                 return true;
             } else {
-                ctx.runOnUiThread(() -> {
+                runOnUiThread(() -> {
                     if (connectionListener != null && player.getPlaybackState() != Player.STATE_READY) {
                         noInternetErrorShowing = true;
                         connectionListener.onConnectionError();
@@ -247,6 +248,10 @@ public class ExoPlayerWrapper implements LifecycleObserver {
             Timber.d(e);
             return false;
         }
+    }
+
+    private void runOnUiThread(Runnable runnable) {
+        new Handler(Looper.getMainLooper()).post(runnable);
     }
 
     private boolean isNetworkAvailable() {
@@ -270,7 +275,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
                 super.onAvailable(network);
             }
         };
-        connectivityManager = (ConnectivityManager) ctx.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
+        connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
     }
 
@@ -441,7 +446,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     }
 
     public static class Builder {
-        private FragmentActivity ctx;
+        private Context ctx;
         private Player.Listener listener;
         private String preferredTrackLanguage;
         private View btnSelectAudioTrack, btnSelectVideoTrack, btnSelectSubtitleTrack;
@@ -479,7 +484,6 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         }
 
         /**
-         *
          * @param loggingEnabled enables the default analytics listener, EventLogger. To see the logs from the player, filter the logcat output by "EventLogger".
          * @return builder, for convenience
          */
