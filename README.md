@@ -1,5 +1,4 @@
 [![](https://jitpack.io/v/ivankostadinovic/ExoPlayerWrapper.svg)](https://jitpack.io/#ivankostadinovic/ExoPlayerWrapper)
-
 # ExoPlayerWrapper
 A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper.
 
