@@ -269,7 +269,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         networkCallback = new ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(@NonNull Network network) {
-                if (connectionListener != null) {
+                if (connectionListener != null && noInternetErrorShowing) {
                     connectionListener.onConnectionReturned();
                 }
                 super.onAvailable(network);
