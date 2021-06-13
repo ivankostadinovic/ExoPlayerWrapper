@@ -93,7 +93,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
 ```
 
 ## Logging
-To see the logs from the player, filter the logcat output by "EventLogger".
+To see the logs from the player, filter the logcat output by "EventLogger". Don't forget to turn this off for production builds.
 ```java
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
 	    .setLoggingEnabled(true)
