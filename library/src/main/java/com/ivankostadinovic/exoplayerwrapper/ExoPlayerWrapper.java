@@ -104,6 +104,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     }
 
     private ExoPlayerWrapper(@NonNull FragmentActivity ctx,
+                             boolean loggingEnabled,
                              boolean handleLifecycleEvents,
                              @NonNull LifecycleOwner lifecycleOwner,
                              int extensionRendererMode,
@@ -216,7 +217,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
             }
         }
 
-        if (BuildConfig.DEBUG) {
+        if (loggingEnabled) {
             player.addAnalyticsListener(new EventLogger(trackSelector));
         }
 
@@ -449,6 +450,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         private LifecycleOwner lifecycleOwner;
         private boolean handleLifecycleEvents;
         private int extensionRendererMode = DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
+        private boolean loggingEnabled;
 
         /**
          * @param ctx Context that will be used to initialize the player
@@ -473,6 +475,16 @@ public class ExoPlayerWrapper implements LifecycleObserver {
          */
         public Builder setExtensionRendererMode(@DefaultRenderersFactory.ExtensionRendererMode int extensionRendererMode) {
             this.extensionRendererMode = extensionRendererMode;
+            return this;
+        }
+
+        /**
+         *
+         * @param loggingEnabled enables the default analytics listener, EventLogger. To see the logs from the player, filter the logcat output by "EventLogger".
+         * @return builder, for convenience
+         */
+        public Builder setLoggingEnabled(boolean loggingEnabled) {
+            this.loggingEnabled = loggingEnabled;
             return this;
         }
 
@@ -534,6 +546,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
         public ExoPlayerWrapper build() {
             return new ExoPlayerWrapper(ctx,
+                loggingEnabled,
                 handleLifecycleEvents,
                 lifecycleOwner,
                 extensionRendererMode,
