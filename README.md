@@ -1,5 +1,5 @@
 # ExoPlayerWrapper
-A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper. EventLogger is added by default for the debug build type.
+A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper.
 
 
 
@@ -46,11 +46,18 @@ dependencies {
         exoPlayerWrapper.playMedia(mediaUrl);
 ```
 
-## Observing player, lifecycle and internet connection events
-
+## Observing lifecycle events
+Use this if you want the playback to be paused when the activity/fragment is no longer visible, and resumed (if it was playing) after the activity/fragment is visible again.
+This also enables automatic releasing of resources used by the player when the activity/fragment is destroyed.
 ```java
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
             .setHandleLifecycleEvents(true, this)   //default is false
+            .build();
+```
+
+## Observing player and internet connection events
+```java
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
             .setListener(new Player.Listener() {  //you can override any Player.Listener function here
                 @Override
                 public void onIsPlayingChanged(boolean isPlaying) {
@@ -60,7 +67,7 @@ dependencies {
             .setConnectionListener(new ExoPlayerWrapper.ConnectionListener() {
                 @Override
                 public void onConnectionError() {
-                    showNoInternetError(); // your function to show to the user that there is an internet issue
+                    showNoInternetError(); // your function to show to the user that there is an internet connection issue
                 }
 
                 @Override
@@ -68,7 +75,7 @@ dependencies {
                     hideNoInternetError(); //your function to show to the user that the internet connection returned
                 }
             })
-            .build();
+	    .build()
 ```
 
 ## Track selection and preferred language
@@ -89,6 +96,14 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
 ```java
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
+            .build();
+```
+
+## Logging
+To see the logs from the player, filter the logcat output by "EventLogger". Don't forget to turn this off for production builds.
+```java
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
+	    .setLoggingEnabled(true)
             .build();
 ```
 
