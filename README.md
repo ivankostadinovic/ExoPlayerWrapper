@@ -26,14 +26,6 @@ dependencies {
 
 # Usage
 
-## Logging
-To see the logs from the player, filter the logcat output by "EventLogger".
-```java
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
-	    .setLoggingEnabled(true)
-            .build();
-```
-
 ## Playback without video
 ```java
         String mediaUrl = "...";
@@ -97,6 +89,14 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
 ```java
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
+            .build();
+```
+
+## Logging
+To see the logs from the player, filter the logcat output by "EventLogger".
+```java
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
+	    .setLoggingEnabled(true)
             .build();
 ```
 
