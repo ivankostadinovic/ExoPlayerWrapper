@@ -1,5 +1,5 @@
 # ExoPlayerWrapper
-A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper. EventLogger is added by default for the debug build type.
+A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper.
 
 
 
@@ -25,6 +25,14 @@ dependencies {
 ```
 
 # Usage
+
+## Logging
+To see the logs from the player, filter the logcat output by "EventLogger".
+```java
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
+	    .setLoggingEnabled(true)
+            .build();
+```
 
 ## Playback without video
 ```java
