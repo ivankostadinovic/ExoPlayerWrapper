@@ -74,7 +74,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     public boolean wasPlaying = true, noInternetErrorShowing;
 
     @Nullable
-    private ConnectionListener connectionListener;
+    private final ConnectionListener connectionListener;
 
     @Nullable
     public View btnSelectAudioTrack, btnSelectVideoTrack, btnSelectSubtitleTrack;
@@ -393,7 +393,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     /**
      * Play media from the given url
      *
-     * @param url
+     * @param url url
      */
     public void playMedia(String url) {
         playMedia(Uri.parse(url));
@@ -446,7 +446,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     }
 
     public static class Builder {
-        private Context ctx;
+        private final Context ctx;
         private Player.Listener listener;
         private String preferredTrackLanguage;
         private View btnSelectAudioTrack, btnSelectVideoTrack, btnSelectSubtitleTrack;
@@ -460,7 +460,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         /**
          * @param ctx Context that will be used to initialize the player
          */
-        public Builder(@NonNull FragmentActivity ctx) {
+        public Builder(@NonNull Context ctx) {
             this.ctx = ctx;
         }
 
@@ -468,7 +468,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
          * @param ctx        Context that will be used with the player
          * @param playerView PlayerView for which the player will be bound to
          */
-        public Builder(@NonNull FragmentActivity ctx,
+        public Builder(@NonNull Context ctx,
                        @Nullable PlayerView playerView) {
             this.ctx = ctx;
             this.playerView = playerView;
