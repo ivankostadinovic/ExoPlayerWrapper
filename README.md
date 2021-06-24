@@ -21,9 +21,10 @@ allprojects
 **Step 2.** Add the dependency in your apps module build.gradle
 ```Gradle
 dependencies {
-	        implementation 'com.github.ivankostadinovic:ExoPlayerWrapper:0.5.3'
+	        implementation 'com.github.ivankostadinovic:ExoPlayerWrapper:<latest-version>' 
 }
 ```
+You can see the latest version at the top of the Readme.MD file, inside the Jitpack image.
 
 # Usage
 
