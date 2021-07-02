@@ -35,6 +35,7 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.source.hls.playlist.HlsPlaylistTracker;
 import com.google.android.exoplayer2.source.rtsp.RtspMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -594,8 +595,9 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
     private void handlePlayerError(@NonNull ExoPlaybackException error) {
         if (error.type == ExoPlaybackException.TYPE_SOURCE &&
-            (error.getSourceException() instanceof BehindLiveWindowException ||
-                error.getSourceException() instanceof HttpDataSource.InvalidResponseCodeException)) {
+            (error.getSourceException() instanceof BehindLiveWindowException
+                || error.getSourceException() instanceof HttpDataSource.InvalidResponseCodeException
+                || error.getSourceException() instanceof HlsPlaylistTracker.PlaylistStuckException)) {
             reloadCurrentMedia();
         }
     }
