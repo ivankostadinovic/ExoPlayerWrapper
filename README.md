@@ -31,7 +31,7 @@ You can see the latest version at the top of the Readme.MD file, inside the JitP
 ## Playback without video
 ```java
         String mediaUrl = "...";
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context)
             .build();
         
         exoPlayerWrapper.playMedia(mediaUrl);
@@ -42,7 +42,7 @@ You can see the latest version at the top of the Readme.MD file, inside the JitP
         String mediaUrl = "...";
         
         PlayerView playerView = findViewById(R.id.player_view);
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context, playerView)
             .build();
         
         exoPlayerWrapper.playMedia(mediaUrl);
@@ -53,13 +53,13 @@ Use this if you want the playback to be paused when the activity/fragment is no 
 This also enables automatic releasing of resources used by the player when the activity/fragment is destroyed.
 ```java
         ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
-            .setHandleLifecycleEvents(true, this)   //default is false
+            .setHandleLifecycleEvents(true, lifeCycleOwner)   //default is false, lifeCycleOwner - LifeCycleOwner to which the player will be bound to (activity or fragment)
             .build();
 ```
 
 ## Observing player and internet connection events
 ```java
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context, playerView)
             .setListener(new Player.Listener() {  //you can override any Player.Listener function here
                 @Override
                 public void onIsPlayingChanged(boolean isPlaying) {
@@ -88,7 +88,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
         buttonSelectVideoTrack = findViewById(R.id.btn_video; //a view which when clicked will open video track selection dialog
         buttonSelectSubtitleTrack = findViewById(R.id.btn_subtitle); //a view which when clicked will open subtitle track selection dialog
 
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context, playerView)
             .setTrackSelectionButtons(buttonSelectAudioTrack, buttonSelectVideoTrack, buttonSelectSubtitleTrack)
             .setPreferredTrackLanguage("en") //default isn't set, IETF BCP 47 conformant tag
             .build();
@@ -96,7 +96,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
 
 ## Enable extension rendering
 ```java
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context, playerView)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
             .build();
 ```
@@ -104,7 +104,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
 ## Logging
 To see the logs from the player, filter the logcat output by "EventLogger". Don't forget to turn this off for production builds.
 ```java
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context)
 	    .setLoggingEnabled(true)
             .build();
 ```
