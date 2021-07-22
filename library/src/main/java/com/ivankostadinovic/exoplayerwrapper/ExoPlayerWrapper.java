@@ -381,23 +381,39 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
 
     /**
-     * @param uri play Media from the given Uri
-     */
-    public void playMedia(Uri uri) {
-        Timber.d("media url %s", uri);
-        currentMediaSource = getMediaSource(uri);
-        player.setMediaSource(currentMediaSource);
-        player.prepare();
-        player.setPlayWhenReady(true);
-    }
-
-    /**
      * Play media from the given url
      *
      * @param url url
      */
     public void playMedia(String url) {
         playMedia(Uri.parse(url));
+    }
+
+    /**
+     * @param uri play Media from the given Uri
+     */
+    public void playMedia(Uri uri) {
+        playMedia(uri, null);
+    }
+
+    /**
+     * @param url play Media from the given url
+     * @param tag optional tag for Player analytics
+     */
+    public void playMedia(String url, @Nullable Object tag) {
+        playMedia(Uri.parse(url), tag);
+    }
+
+    /**
+     * @param uri play Media from the given Uri
+     * @param tag optional tag for Player analytics
+     */
+    public void playMedia(Uri uri, @Nullable Object tag) {
+        Timber.d("media url %s", uri);
+        currentMediaSource = getMediaSource(uri, tag);
+        player.setMediaSource(currentMediaSource);
+        player.prepare();
+        player.setPlayWhenReady(true);
     }
 
     /**
@@ -409,28 +425,35 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         player.setPlayWhenReady(true);
     }
 
-    private MediaSource getMediaSource(Uri uri) {
+    private MediaSource getMediaSource(Uri uri, Object tag) {
         switch (Util.inferContentType(uri)) {
             case C.TYPE_SS:
                 Timber.d("Content type ss");
-                return ssFactory.createMediaSource(MediaItem.fromUri(uri));
+                return ssFactory.createMediaSource(createMediaItem(uri, tag));
             case C.TYPE_DASH:
                 Timber.d("Content type dash");
-                return dashFactory.createMediaSource(MediaItem.fromUri(uri));
+                return dashFactory.createMediaSource(createMediaItem(uri, tag));
             case C.TYPE_HLS:
                 Timber.d("Content type hls");
-                return hlsFactory.createMediaSource(MediaItem.fromUri(uri));
+                return hlsFactory.createMediaSource(createMediaItem(uri, tag));
             case C.TYPE_OTHER:
                 Timber.d("Content type progressive");
-                return progressiveFactory.createMediaSource(MediaItem.fromUri(uri));
+                return progressiveFactory.createMediaSource(createMediaItem(uri, tag));
             default: {
                 Timber.d("Content type hls");
-                return hlsFactory.createMediaSource(MediaItem.fromUri(uri));
+                return hlsFactory.createMediaSource(createMediaItem(uri, tag));
             }
             case C.TYPE_RTSP:
                 Timber.d("Content type rtsp");
-                return rtspFactory.createMediaSource(MediaItem.fromUri(uri));
+                return rtspFactory.createMediaSource(createMediaItem(uri, tag));
         }
+    }
+
+    private MediaItem createMediaItem(Uri uri, Object tag) {
+        return new MediaItem.Builder()
+            .setTag(tag)
+            .setUri(uri)
+            .build();
     }
 
     public void setPlayWhenReady(boolean playWhenReady) {
