@@ -24,7 +24,8 @@ dependencies {
 	        implementation 'com.github.ivankostadinovic:ExoPlayerWrapper:<latest-version>' 
 }
 ```
-You can see the latest version at the top of the Readme.MD file, inside the JitPack image.
+You can see the latest version at the top of the Readme.MD file, inside the JitPack image. 
+The first three parts of the version code are aligned with the ExoPlayer version that is used internally.
 
 # Usage
 
