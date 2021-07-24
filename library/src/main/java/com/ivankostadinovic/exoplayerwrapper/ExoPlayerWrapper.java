@@ -13,7 +13,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -50,10 +49,11 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.EventLogger;
+import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 
-import timber.log.Timber;
+import java.net.SocketTimeoutException;
 
 import static com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS;
 import static com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MIN_BUFFER_MS;
@@ -89,19 +89,19 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void lifecycleOnStart() {
-        Timber.d("player onStart");
+        log("player onStart");
         ExoPlayerWrapper.this.onStart();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void lifecycleOnStop() {
-        Timber.d("player onStop");
+        log("player onStop");
         ExoPlayerWrapper.this.onStop();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void lifecycleOnDestroy() {
-        Timber.d("player onDestroy");
+        log("player onDestroy");
         ExoPlayerWrapper.this.release();
     }
 
@@ -246,7 +246,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
                 return false;
             }
         } catch (Exception e) {
-            Timber.d(e);
+            e.printStackTrace();
             return false;
         }
     }
@@ -285,7 +285,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         try {
             connectivityManager.unregisterNetworkCallback(networkCallback);
         } catch (Exception e) {
-            Timber.d(e);
+            e.printStackTrace();
         }
     }
 
@@ -338,7 +338,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
                 .build()
                 .show();
         } catch (Exception e) {
-            Timber.d(e);
+            e.printStackTrace();
         }
     }
 
@@ -350,7 +350,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
                 .build()
                 .show();
         } catch (Exception e) {
-            Timber.d(e);
+            e.printStackTrace();
         }
     }
 
@@ -361,7 +361,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
                 .build()
                 .show();
         } catch (Exception e) {
-            Timber.d(e);
+            e.printStackTrace();
         }
     }
 
@@ -409,7 +409,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
      * @param tag optional tag for Player analytics
      */
     public void playMedia(Uri uri, @Nullable Object tag) {
-        Timber.d("media url %s", uri);
+        log("media url " + uri);
         currentMediaSource = getMediaSource(uri, tag);
         player.setMediaSource(currentMediaSource);
         player.prepare();
@@ -428,23 +428,23 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     private MediaSource getMediaSource(Uri uri, Object tag) {
         switch (Util.inferContentType(uri)) {
             case C.TYPE_SS:
-                Timber.d("Content type ss");
+                log("Content type ss");
                 return ssFactory.createMediaSource(createMediaItem(uri, tag));
             case C.TYPE_DASH:
-                Timber.d("Content type dash");
+                log("Content type dash");
                 return dashFactory.createMediaSource(createMediaItem(uri, tag));
             case C.TYPE_HLS:
-                Timber.d("Content type hls");
+                log("Content type hls");
                 return hlsFactory.createMediaSource(createMediaItem(uri, tag));
             case C.TYPE_OTHER:
-                Timber.d("Content type progressive");
+                log("Content type progressive");
                 return progressiveFactory.createMediaSource(createMediaItem(uri, tag));
             default: {
-                Timber.d("Content type hls");
+                log("Content type hls");
                 return hlsFactory.createMediaSource(createMediaItem(uri, tag));
             }
             case C.TYPE_RTSP:
-                Timber.d("Content type rtsp");
+                log("Content type rtsp");
                 return rtspFactory.createMediaSource(createMediaItem(uri, tag));
         }
     }
@@ -620,7 +620,8 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         if (error.type == ExoPlaybackException.TYPE_SOURCE &&
             (error.getSourceException() instanceof BehindLiveWindowException
                 || error.getSourceException() instanceof HttpDataSource.InvalidResponseCodeException
-                || error.getSourceException() instanceof HlsPlaylistTracker.PlaylistStuckException)) {
+                || error.getSourceException() instanceof HlsPlaylistTracker.PlaylistStuckException
+                || error.getSourceException() instanceof SocketTimeoutException)) {
             reloadCurrentMedia();
         }
     }
@@ -646,5 +647,9 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         if (btnSelectSubtitleTrack != null) {
             btnSelectSubtitleTrack.setVisibility(textFound ? View.VISIBLE : View.INVISIBLE);
         }
+    }
+
+    private static void log(String message) {
+        Log.d("ExoPlayerWrapper: ", message);
     }
 }
