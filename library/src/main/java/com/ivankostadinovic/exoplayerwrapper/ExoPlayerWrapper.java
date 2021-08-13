@@ -1,5 +1,6 @@
 package com.ivankostadinovic.exoplayerwrapper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -21,20 +22,18 @@ import androidx.lifecycle.OnLifecycleEvent;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.source.hls.playlist.HlsPlaylistTracker;
 import com.google.android.exoplayer2.source.rtsp.RtspMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -47,13 +46,9 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy;
-import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.EventLogger;
-import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
-
-import java.net.SocketTimeoutException;
 
 import static com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS;
 import static com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MIN_BUFFER_MS;
@@ -62,6 +57,8 @@ import static com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderF
 /**
  * An {@link ExoPlayer} implementation. Instances can be obtained from {@link ExoPlayerWrapper.Builder}.
  */
+@SuppressWarnings("unused")
+@SuppressLint("SwitchIntDef")
 public class ExoPlayerWrapper implements LifecycleObserver {
     public Context ctx;
     public SimpleExoPlayer player;
@@ -89,20 +86,17 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void lifecycleOnStart() {
-        log("player onStart");
-        ExoPlayerWrapper.this.onStart();
+        onStart();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void lifecycleOnStop() {
-        log("player onStop");
-        ExoPlayerWrapper.this.onStop();
+        onStop();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void lifecycleOnDestroy() {
-        log("player onDestroy");
-        ExoPlayerWrapper.this.release();
+        release();
     }
 
     private ExoPlayerWrapper(@NonNull Context ctx,
@@ -409,7 +403,6 @@ public class ExoPlayerWrapper implements LifecycleObserver {
      * @param tag optional tag for Player analytics
      */
     public void playMedia(Uri uri, @Nullable Object tag) {
-        log("media url " + uri);
         currentMediaSource = getMediaSource(uri, tag);
         player.setMediaSource(currentMediaSource);
         player.prepare();
@@ -428,23 +421,17 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     private MediaSource getMediaSource(Uri uri, Object tag) {
         switch (Util.inferContentType(uri)) {
             case C.TYPE_SS:
-                log("Content type ss");
                 return ssFactory.createMediaSource(createMediaItem(uri, tag));
             case C.TYPE_DASH:
-                log("Content type dash");
                 return dashFactory.createMediaSource(createMediaItem(uri, tag));
             case C.TYPE_HLS:
-                log("Content type hls");
                 return hlsFactory.createMediaSource(createMediaItem(uri, tag));
             case C.TYPE_OTHER:
-                log("Content type progressive");
                 return progressiveFactory.createMediaSource(createMediaItem(uri, tag));
             default: {
-                log("Content type hls");
                 return hlsFactory.createMediaSource(createMediaItem(uri, tag));
             }
             case C.TYPE_RTSP:
-                log("Content type rtsp");
                 return rtspFactory.createMediaSource(createMediaItem(uri, tag));
         }
     }
@@ -596,7 +583,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
     private class ExoPlayerWrapperEventListener implements Player.Listener {
         @Override
-        public void onPlayerError(@NonNull ExoPlaybackException error) {
+        public void onPlayerError(@NonNull PlaybackException error) {
             handlePlayerError(error);
         }
 
@@ -616,13 +603,26 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         }
     }
 
-    private void handlePlayerError(@NonNull ExoPlaybackException error) {
-        if (error.type == ExoPlaybackException.TYPE_SOURCE &&
-            (error.getSourceException() instanceof BehindLiveWindowException
-                || error.getSourceException() instanceof HttpDataSource.InvalidResponseCodeException
-                || error.getSourceException() instanceof HlsPlaylistTracker.PlaylistStuckException
-                || error.getSourceException() instanceof SocketTimeoutException)) {
-            reloadCurrentMedia();
+    private void handlePlayerError(@NonNull PlaybackException error) {
+        switch (error.errorCode) {
+            case PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW:
+            case PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS:
+            case PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND:
+            case PlaybackException.ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE:
+            case PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED:
+            case PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT:
+            case PlaybackException.ERROR_CODE_IO_UNSPECIFIED:
+            case PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED:
+            case PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED:
+            case PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED:
+            case PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED:
+            case PlaybackException.ERROR_CODE_REMOTE_ERROR:
+            case PlaybackException.ERROR_CODE_TIMEOUT:
+            case PlaybackException.ERROR_CODE_UNSPECIFIED:
+                reloadCurrentMedia();
+                break;
+            default:
+                error.printStackTrace();
         }
     }
 
@@ -649,7 +649,4 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         }
     }
 
-    private static void log(String message) {
-        Log.d("ExoPlayerWrapper: ", message);
-    }
 }
