@@ -28,6 +28,7 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -51,8 +52,9 @@ import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 
 import static com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS;
-import static com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MIN_BUFFER_MS;
 import static com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES;
+
+import okhttp3.OkHttpClient;
 
 /**
  * An {@link ExoPlayer} implementation. Instances can be obtained from {@link ExoPlayerWrapper.Builder}.
@@ -110,7 +112,8 @@ public class ExoPlayerWrapper implements LifecycleObserver {
                              @Nullable String preferredTrackLanguage,
                              @Nullable View btnSelectAudioTrack,
                              @Nullable View btnSelectVideoTrack,
-                             @Nullable View btnSelectSubtitleTrack) {
+                             @Nullable View btnSelectSubtitleTrack,
+                             @Nullable OkHttpClient okHttpClient) {
 
         if (handleLifecycleEvents) {
             lifecycleOwner.getLifecycle().addObserver(this);
@@ -138,9 +141,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
                 ctx,
                 null,
-                new DefaultHttpDataSource.Factory()
-                        .setUserAgent(Util.getUserAgent(ctx, ctx.getPackageName()))
-                        .setAllowCrossProtocolRedirects(true));
+                getDataSourceFactory(okHttpClient));
 
         DefaultRenderersFactory defaultRenderersFactory = new DefaultRenderersFactory(ctx)
                 .setExtensionRendererMode(extensionRendererMode);
@@ -224,6 +225,17 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         player.addListener(new ExoPlayerWrapperEventListener());
 
         setUpInternetListener();
+    }
+
+    private DataSource.Factory getDataSourceFactory(OkHttpClient okHttpClient) {
+        if (okHttpClient != null) {
+            return new OkHttpDataSource.Factory(okHttpClient)
+                    .setUserAgent(Util.getUserAgent(ctx, ctx.getPackageName()));
+        } else {
+            return new DefaultHttpDataSource.Factory()
+                    .setUserAgent(Util.getUserAgent(ctx, ctx.getPackageName()))
+                    .setAllowCrossProtocolRedirects(true);
+        }
     }
 
     private boolean handleInternetError() {
@@ -467,6 +479,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         private boolean handleLifecycleEvents;
         private int extensionRendererMode = DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
         private boolean loggingEnabled;
+        private OkHttpClient okHttpClient;
 
         /**
          * @param ctx Context that will be used to initialize the player
@@ -558,6 +571,15 @@ public class ExoPlayerWrapper implements LifecycleObserver {
             return this;
         }
 
+        /**
+         * @param okHttpClient OkHttpClient which will be used for network calls
+         * @return builder, for convenience
+         */
+        public Builder setOkHttpClient(@Nullable OkHttpClient okHttpClient) {
+            this.okHttpClient = okHttpClient;
+            return this;
+        }
+
 
         public ExoPlayerWrapper build() {
             return new ExoPlayerWrapper(ctx,
@@ -571,7 +593,8 @@ public class ExoPlayerWrapper implements LifecycleObserver {
                     preferredTrackLanguage,
                     btnSelectAudioTrack,
                     btnSelectVideoTrack,
-                    btnSelectSubtitleTrack);
+                    btnSelectSubtitleTrack,
+                    okHttpClient);
         }
     }
 
