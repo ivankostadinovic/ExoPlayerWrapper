@@ -70,8 +70,11 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     public SsMediaSource.Factory ssFactory;
     public RtspMediaSource.Factory rtspFactory;
     public DefaultTrackSelector trackSelector;
-    public MediaSource currentMediaSource;
     public boolean wasPlaying = true, noInternetErrorShowing;
+
+    //information about currently playing Media
+    public MediaSource currentMediaSource;
+    public Uri currentMediaUri;
 
     @Nullable
     private final ConnectionListener connectionListener;
@@ -139,18 +142,18 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         this.connectionListener = connectionListener;
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
-                ctx,
-                null,
-                getDataSourceFactory(okHttpClient));
+            ctx,
+            null,
+            getDataSourceFactory(okHttpClient));
 
         DefaultRenderersFactory defaultRenderersFactory = new DefaultRenderersFactory(ctx)
-                .setExtensionRendererMode(extensionRendererMode);
+            .setExtensionRendererMode(extensionRendererMode);
 
         trackSelector = new DefaultTrackSelector(ctx);
         trackSelector.setParameters(trackSelector
-                .buildUponParameters()
-                .setPreferredAudioLanguage(preferredTrackLanguage)
-                .setPreferredTextLanguage(preferredTrackLanguage));
+            .buildUponParameters()
+            .setPreferredAudioLanguage(preferredTrackLanguage)
+            .setPreferredTextLanguage(preferredTrackLanguage));
 
 
         DefaultLoadErrorHandlingPolicy errorHandlingPolicy = new DefaultLoadErrorHandlingPolicy() {
@@ -170,47 +173,47 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
         DefaultHlsExtractorFactory defaultHlsExtractorFactory = new DefaultHlsExtractorFactory(FLAG_ALLOW_NON_IDR_KEYFRAMES, false);
         hlsFactory = new HlsMediaSource.Factory(dataSourceFactory)
-                .setExtractorFactory(defaultHlsExtractorFactory)
-                .setLoadErrorHandlingPolicy(errorHandlingPolicy)
-                .setAllowChunklessPreparation(true);
+            .setExtractorFactory(defaultHlsExtractorFactory)
+            .setLoadErrorHandlingPolicy(errorHandlingPolicy)
+            .setAllowChunklessPreparation(true);
 
         progressiveFactory = new ProgressiveMediaSource.Factory(dataSourceFactory)
-                .setLoadErrorHandlingPolicy(errorHandlingPolicy);
+            .setLoadErrorHandlingPolicy(errorHandlingPolicy);
 
         dashFactory = new DashMediaSource.Factory(dataSourceFactory)
-                .setLoadErrorHandlingPolicy(errorHandlingPolicy);
+            .setLoadErrorHandlingPolicy(errorHandlingPolicy);
 
         ssFactory = new SsMediaSource.Factory(dataSourceFactory)
-                .setLoadErrorHandlingPolicy(errorHandlingPolicy);
+            .setLoadErrorHandlingPolicy(errorHandlingPolicy);
 
         rtspFactory = new RtspMediaSource.Factory()
-                .setLoadErrorHandlingPolicy(errorHandlingPolicy);
+            .setLoadErrorHandlingPolicy(errorHandlingPolicy);
 
         LoadControl loadControl = new DefaultLoadControl.Builder()
-                .setBufferDurationsMs(DEFAULT_MAX_BUFFER_MS,
-                        DEFAULT_MAX_BUFFER_MS,
-                        500,
-                        2000)
-                .setPrioritizeTimeOverSizeThresholds(true)
-                .build();
+            .setBufferDurationsMs(DEFAULT_MAX_BUFFER_MS,
+                DEFAULT_MAX_BUFFER_MS,
+                500,
+                2000)
+            .setPrioritizeTimeOverSizeThresholds(true)
+            .build();
 
         player = new SimpleExoPlayer
-                .Builder(ctx, defaultRenderersFactory)
-                .setTrackSelector(trackSelector)
-                .setLoadControl(loadControl)
-                .setReleaseTimeoutMs(5000) //sometimes releasing player takes a bit longer and would cause errors in the background
-                .build();
+            .Builder(ctx, defaultRenderersFactory)
+            .setTrackSelector(trackSelector)
+            .setLoadControl(loadControl)
+            .setReleaseTimeoutMs(5000) //sometimes releasing player takes a bit longer and would cause errors in the background
+            .build();
 
         if (playerView != null) {
             playerView.setPlayer(player);
             if (playerView.getSubtitleView() != null) {
                 playerView.getSubtitleView().setStyle(new CaptionStyleCompat(
-                        ctx.getResources().getColor(R.color.subtitle_color),      //subtitle text color
-                        ctx.getResources().getColor(android.R.color.transparent), //subtitle background color
-                        ctx.getResources().getColor(android.R.color.transparent), //subtitle window color
-                        CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW, //subtitle edge type
-                        ctx.getResources().getColor(android.R.color.black), //subtitle edge color
-                        null));
+                    ctx.getResources().getColor(R.color.subtitle_color),      //subtitle text color
+                    ctx.getResources().getColor(android.R.color.transparent), //subtitle background color
+                    ctx.getResources().getColor(android.R.color.transparent), //subtitle window color
+                    CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW, //subtitle edge type
+                    ctx.getResources().getColor(android.R.color.black), //subtitle edge color
+                    null));
             }
         }
 
@@ -230,11 +233,11 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     private DataSource.Factory getDataSourceFactory(OkHttpClient okHttpClient) {
         if (okHttpClient != null) {
             return new OkHttpDataSource.Factory(okHttpClient)
-                    .setUserAgent(Util.getUserAgent(ctx, ctx.getPackageName()));
+                .setUserAgent(Util.getUserAgent(ctx, ctx.getPackageName()));
         } else {
             return new DefaultHttpDataSource.Factory()
-                    .setUserAgent(Util.getUserAgent(ctx, ctx.getPackageName()))
-                    .setAllowCrossProtocolRedirects(true);
+                .setUserAgent(Util.getUserAgent(ctx, ctx.getPackageName()))
+                .setAllowCrossProtocolRedirects(true);
         }
     }
 
@@ -268,10 +271,10 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
     private void setUpInternetListener() {
         networkRequest = new NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
-                .build();
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
+            .build();
 
         networkCallback = new ConnectivityManager.NetworkCallback() {
             @Override
@@ -334,15 +337,17 @@ public class ExoPlayerWrapper implements LifecycleObserver {
         connectivityManager = null;
         networkCallback = null;
         networkRequest = null;
+        currentMediaSource = null;
+        currentMediaUri = null;
     }
 
     public void onSelectSubtitleTrackClick(Context ctx) {
         try {
             new TrackSelectionDialogBuilder(ctx, ctx.getString(R.string.select_subtitle_track), trackSelector, getRendererIndex(C.TRACK_TYPE_TEXT))
-                    .setTheme(R.style.DialogTheme)
-                    .setShowDisableOption(true)
-                    .build()
-                    .show();
+                .setTheme(R.style.DialogTheme)
+                .setShowDisableOption(true)
+                .build()
+                .show();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -351,10 +356,10 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     public void onSelectVideoTrackClick(Context ctx) {
         try {
             new TrackSelectionDialogBuilder(ctx, ctx.getString(R.string.select_video_track), trackSelector, getRendererIndex(C.TRACK_TYPE_VIDEO))
-                    .setTheme(R.style.DialogTheme)
-                    .setShowDisableOption(true)
-                    .build()
-                    .show();
+                .setTheme(R.style.DialogTheme)
+                .setShowDisableOption(true)
+                .build()
+                .show();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -363,9 +368,9 @@ public class ExoPlayerWrapper implements LifecycleObserver {
     public void onSelectAudioTrackCLick(Context ctx) {
         try {
             new TrackSelectionDialogBuilder(ctx, ctx.getString(R.string.select_audio_track), trackSelector, getRendererIndex(C.TRACK_TYPE_AUDIO))
-                    .setTheme(R.style.DialogTheme)
-                    .build()
-                    .show();
+                .setTheme(R.style.DialogTheme)
+                .build()
+                .show();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -415,6 +420,7 @@ public class ExoPlayerWrapper implements LifecycleObserver {
      * @param tag optional tag for Player analytics
      */
     public void playMedia(Uri uri, @Nullable Object tag) {
+        currentMediaUri = uri;
         currentMediaSource = getMediaSource(uri, tag);
         player.setMediaSource(currentMediaSource);
         player.prepare();
@@ -450,9 +456,9 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
     private MediaItem createMediaItem(Uri uri, Object tag) {
         return new MediaItem.Builder()
-                .setTag(tag)
-                .setUri(uri)
-                .build();
+            .setTag(tag)
+            .setUri(uri)
+            .build();
     }
 
     public void setPlayWhenReady(boolean playWhenReady) {
@@ -583,18 +589,18 @@ public class ExoPlayerWrapper implements LifecycleObserver {
 
         public ExoPlayerWrapper build() {
             return new ExoPlayerWrapper(ctx,
-                    loggingEnabled,
-                    handleLifecycleEvents,
-                    lifecycleOwner,
-                    extensionRendererMode,
-                    playerView,
-                    listener,
-                    connectionListener,
-                    preferredTrackLanguage,
-                    btnSelectAudioTrack,
-                    btnSelectVideoTrack,
-                    btnSelectSubtitleTrack,
-                    okHttpClient);
+                loggingEnabled,
+                handleLifecycleEvents,
+                lifecycleOwner,
+                extensionRendererMode,
+                playerView,
+                listener,
+                connectionListener,
+                preferredTrackLanguage,
+                btnSelectAudioTrack,
+                btnSelectVideoTrack,
+                btnSelectSubtitleTrack,
+                okHttpClient);
         }
     }
 
