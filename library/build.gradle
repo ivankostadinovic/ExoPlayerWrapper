@@ -21,7 +21,7 @@ android {
     }
 }
 
-def exoPlayerVersion = '2.15.0'
+def exoPlayerVersion = '2.15.1'
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.3.1'
