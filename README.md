@@ -53,14 +53,14 @@ The first three parts of the version code are aligned with the ExoPlayer version
 Use this if you want the playback to be paused when the activity/fragment is no longer visible, and resumed (if it was playing) after the activity/fragment is visible again.
 This also enables automatic releasing of resources used by the player when the activity/fragment is destroyed.
 ```java
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this, playerView)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
             .setHandleLifecycleEvents(true, lifeCycleOwner)   //default is false, lifeCycleOwner - LifeCycleOwner to which the player will be bound to (activity or fragment)
             .build();
 ```
 
 ## Observing player and internet connection events
 ```java
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context, playerView)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context)
             .setListener(new Player.Listener() {  //you can override any Player.Listener function here
                 @Override
                 public void onIsPlayingChanged(boolean isPlaying) {
@@ -89,7 +89,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
         buttonSelectVideoTrack = findViewById(R.id.btn_video; //a view which when clicked will open video track selection dialog
         buttonSelectSubtitleTrack = findViewById(R.id.btn_subtitle); //a view which when clicked will open subtitle track selection dialog
 
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context, playerView)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context)
             .setTrackSelectionButtons(buttonSelectAudioTrack, buttonSelectVideoTrack, buttonSelectSubtitleTrack)
             .setPreferredTrackLanguage("en") //default isn't set, IETF BCP 47 conformant tag
             .build();
@@ -97,7 +97,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
 
 ## Enable extension rendering
 ```java
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context, playerView)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
             .build();
 ```
@@ -106,7 +106,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
 To enable OkHttp networking instead of default networking, pass a OkHttpClient object to the player wrapper.
 ```java
 	OkHttpClient okHttpClient = new OkHttpClient(); //create a OkHttpClient object, or reuse one you already have in the app.
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context, playerView)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context)
             .setOkHttpClient(okHttpClient)
             .build();
 ```
