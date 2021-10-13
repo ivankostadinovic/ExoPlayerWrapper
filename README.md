@@ -39,7 +39,7 @@ The first three parts of the version code are aligned with the ExoPlayer version
 ```
 
 ## Playback with video
-In your xml layout file, declare a player view
+In your XML layout file, declare a player view.
 
 ```xml
 	...
