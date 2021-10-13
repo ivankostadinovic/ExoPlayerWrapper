@@ -102,7 +102,7 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
             .build();
 ```
 
-## OkHttpNetworking
+## OkHttp networking
 To enable OkHttp networking instead of default networking, pass a OkHttpClient object to the player wrapper.
 ```java
 	OkHttpClient okHttpClient = new OkHttpClient(); //create a OkHttpClient object, or reuse one you already have in the app.
