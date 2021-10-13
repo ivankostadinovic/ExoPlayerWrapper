@@ -102,6 +102,15 @@ If you wish to add track selection and/or a preferred audio/subtitle language, p
             .build();
 ```
 
+## OkHttpNetworking
+To enable OkHttp networking instead of default networking, pass a OkHttpClient object to the player wrapper.
+```java
+	OkHttpClient okHttpClient = new OkHttpClient(); //create a OkHttpClient object, or reuse one you already have in the app.
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context, playerView)
+            .setOkHttpClient(okHttpClient)
+            .build();
+```
+
 ## Logging
 To see the logs from the player, filter the logcat output by "EventLogger". Don't forget to turn this off for production builds.
 ```java
