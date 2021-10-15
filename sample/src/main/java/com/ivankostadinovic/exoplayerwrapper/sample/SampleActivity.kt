@@ -14,7 +14,7 @@ class SampleActivity : AppCompatActivity() {
     lateinit var playerWrapper: ExoPlayerWrapper
     lateinit var binding: ActivitySampleBinding
 
-    private val streamUrl = ""
+    private val streamUrl = "https://srv1.adriatelekom.com/PrvaTVHD/index.m3u8?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvdC1hZHJpYS5jb21cL2FwaVwvbG9naW4iLCJpYXQiOjE2MzA5NDc1ODIsIm5iZiI6MTYzMDk0NzU4MiwianRpIjoiY2hMZ0txcW51UHVtdE1mbSIsInN1YiI6IkFSRU5BQkFUTyIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJkZXZpY2VfaWQiOjE3ODYsImlwIjoiMTg1LjI2LjExOS4xMTQiLCJ1c2VyX2lkIjo0fQ.4bC3keDnDFFgDwwOnE6emUYH9JCgRTvyVVqq30ENzWk"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

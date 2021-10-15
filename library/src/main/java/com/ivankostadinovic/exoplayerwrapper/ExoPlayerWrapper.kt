@@ -611,6 +611,7 @@ class ExoPlayerWrapper private constructor(
     fun handleTracksChanged(trackGroups: TrackGroupArray) {
         var textFound = false
         var audioFound = false
+        var videoFound = false
         for (i in 0 until trackGroups.length) {
             for (g in 0 until trackGroups[i].length) {
                 trackGroups[i].getFormat(g).sampleMimeType.let {
@@ -618,11 +619,14 @@ class ExoPlayerWrapper private constructor(
                         audioFound = true
                     } else if (MimeTypes.isText(it)) {
                         textFound = true
+                    } else if (MimeTypes.isVideo(it)) {
+                        videoFound = true
                     }
                 }
             }
         }
         btnSelectAudioTrack?.visibility = if (audioFound) View.VISIBLE else View.INVISIBLE
         btnSelectSubtitleTrack?.visibility = if (textFound) View.VISIBLE else View.INVISIBLE
+        btnSelectVideoTrack?.visibility = if (videoFound) View.VISIBLE else View.INVISIBLE
     }
 }
