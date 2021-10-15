@@ -389,6 +389,13 @@ class ExoPlayerWrapper private constructor(
     }
 
     /**
+     * @param uri uri
+     */
+    fun playMedia(uri: Uri) {
+        playMedia(uri, null)
+    }
+
+    /**
      * @param url play Media from the given url
      * @param tag optional tag for Player analytics
      */
