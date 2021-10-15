@@ -94,6 +94,7 @@ This also enables automatic releasing of resources used by the player when the a
 
 ## Track selection and preferred language
 If you wish to add track selection and/or a preferred audio/subtitle language, pass the views and the preferred language to the library.
+The library will automatically hide the views if there are no tracks of that type available (e.g. if there are no audio tracks available to choose from, the button for selecting audio tracks will be made invisible).
 ```java
         View buttonSelectAudioTrack, buttonSelectVideoTrack, buttonSelectSubtitleTrack;
         buttonSelectAudioTrack = findViewById(R.id.btn_audio); //a view which when clicked will open audio track selection dialog
