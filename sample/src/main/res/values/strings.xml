@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">ExoPlayerWrapper Sample</string>
+    <string name="connection_error">Connection error</string>
+    <string name="connection_returned">Connection returned</string>
+    <string name="volume_changed">Volume Changed</string>
+    <string name="media_item_transition">Media Item Transition</string>
+    <string name="btn_select_audio_track_text">Select Audio Track</string>
+    <string name="btn_select_video_track_text">Select Video Track</string>
+    <string name="btn_select_subtitle_track_text">Select Subtitle Track</string>
+    <string name="reload_current_media">Reload Current Media</string>
+</resources>
