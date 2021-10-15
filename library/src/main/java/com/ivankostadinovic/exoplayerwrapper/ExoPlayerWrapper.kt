@@ -1,42 +1,53 @@
 package com.ivankostadinovic.exoplayerwrapper
 
 import android.content.Context
-import android.net.*
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.net.Uri
 import android.os.Handler
-import androidx.lifecycle.LifecycleOwner
-import com.google.android.exoplayer2.ui.PlayerView
-import okhttp3.OkHttpClient
-import androidx.lifecycle.LifecycleObserver
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.source.dash.DashMediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
-import com.google.android.exoplayer2.source.rtsp.RtspMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.source.MediaSource
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.Lifecycle
-import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import android.os.Looper
 import android.view.View
 import androidx.core.content.ContextCompat
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.ui.TrackSelectionDialogBuilder
-import com.google.android.exoplayer2.trackselection.MappingTrackSelector
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.DefaultRenderersFactory.ExtensionRendererMode
+import com.google.android.exoplayer2.LoadControl
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
+import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.source.dash.DashMediaSource
+import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.source.rtsp.RtspMediaSource
+import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
-import com.google.android.exoplayer2.util.MimeTypes
+import com.google.android.exoplayer2.ui.CaptionStyleCompat
+import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.TrackSelectionDialogBuilder
+import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy
 import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorInfo
-import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory
-import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory
-import com.google.android.exoplayer2.ui.CaptionStyleCompat
-import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.util.EventLogger
+import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.util.Util
+import okhttp3.OkHttpClient
 
 /**
  * An [ExoPlayer] implementation. Instances can be obtained from [ExoPlayerWrapper.Builder].
@@ -153,18 +164,18 @@ class ExoPlayerWrapper private constructor(
         player = SimpleExoPlayer.Builder(ctx, defaultRenderersFactory)
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
-            .setReleaseTimeoutMs(5000) //sometimes releasing player takes a bit longer and would cause errors in the background
+            .setReleaseTimeoutMs(5000) // sometimes releasing player takes a bit longer and would cause errors in the background
             .build()
 
         playerView?.let {
             it.player = player
             it.subtitleView?.setStyle(
                 CaptionStyleCompat(
-                    getColor(R.color.subtitle_color),  //subtitle text color
-                    getColor(android.R.color.transparent),  //subtitle background color
-                    getColor(android.R.color.transparent),  //subtitle window color
-                    CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW,  //subtitle edge type
-                    getColor(android.R.color.black),  //subtitle edge color
+                    getColor(R.color.subtitle_color), // subtitle text color
+                    getColor(android.R.color.transparent), // subtitle background color
+                    getColor(android.R.color.transparent), // subtitle window color
+                    CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW, // subtitle edge type
+                    getColor(android.R.color.black), // subtitle edge color
                     null
                 )
             )
