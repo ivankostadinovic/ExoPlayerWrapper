@@ -64,8 +64,8 @@ In your XML layout file, declare a player view.
 Use this if you want the playback to be paused when the activity/fragment is no longer visible, and resumed (if it was playing) after the activity/fragment is visible again.
 This also enables automatic releasing of resources used by the player when the activity/fragment is destroyed.
 ```java
-        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(this)
-            .setHandleLifecycleEvents(true, lifeCycleOwner)   //default is false, lifeCycleOwner - LifeCycleOwner to which the player will be bound to (activity or fragment)
+        ExoPlayerWrapper exoPlayerWrapper = new ExoPlayerWrapper.Builder(context)
+            .setHandleLifecycleEvents(context, lifeCycleOwner)   //default is false, lifeCycleOwner - LifeCycleOwner to which the player will be bound to (activity or fragment)
             .build();
 ```
 
