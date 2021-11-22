@@ -131,21 +131,26 @@ class ExoPlayerWrapper private constructor(
             false
         )
 
-        hlsFactory = HlsMediaSource.Factory(dataSourceFactory)
+        hlsFactory = HlsMediaSource
+            .Factory(dataSourceFactory)
             .setExtractorFactory(defaultHlsExtractorFactory)
             .setLoadErrorHandlingPolicy(errorHandlingPolicy)
             .setAllowChunklessPreparation(true)
 
-        progressiveFactory = ProgressiveMediaSource.Factory(dataSourceFactory)
+        progressiveFactory = ProgressiveMediaSource
+            .Factory(dataSourceFactory)
             .setLoadErrorHandlingPolicy(errorHandlingPolicy)
 
-        dashFactory = DashMediaSource.Factory(dataSourceFactory)
+        dashFactory = DashMediaSource
+            .Factory(dataSourceFactory)
             .setLoadErrorHandlingPolicy(errorHandlingPolicy)
 
-        ssFactory = SsMediaSource.Factory(dataSourceFactory)
+        ssFactory = SsMediaSource
+            .Factory(dataSourceFactory)
             .setLoadErrorHandlingPolicy(errorHandlingPolicy)
 
-        rtspFactory = RtspMediaSource.Factory()
+        rtspFactory = RtspMediaSource
+            .Factory()
             .setLoadErrorHandlingPolicy(errorHandlingPolicy)
 
         val loadControl = DefaultLoadControl.Builder()
@@ -256,8 +261,7 @@ class ExoPlayerWrapper private constructor(
     }
 
     private fun isNetworkAvailable(): Boolean {
-        val activeNetworkInfo =
-            (ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
+        val activeNetworkInfo = getConnectivityManager()?.activeNetworkInfo
         return activeNetworkInfo?.isConnected ?: false
     }
 
