@@ -64,7 +64,7 @@ class ExoPlayerWrapper private constructor(
     private val btnSelectVideoTrack: View?,
     private val btnSelectSubtitleTrack: View?,
     private val okHttpClient: OkHttpClient?
-) : DefaultLifecycleObserver {
+) : DefaultLifecycleObserver, Player.Listener {
     val player: ExoPlayer
     val hlsFactory: HlsMediaSource.Factory
     val dashFactory: DashMediaSource.Factory
@@ -191,23 +191,8 @@ class ExoPlayerWrapper private constructor(
             player.addListener(it)
         }
 
-        player.addListener(ExoPlayerWrapperEventListener())
+        player.addListener(this)
         setUpInternetListener()
-    }
-
-    override fun onStart(owner: LifecycleOwner) {
-        lifecycleOnStart()
-        super.onStart(owner)
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        lifecycleOnStop()
-        super.onStop(owner)
-    }
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        release()
-        super.onDestroy(owner)
     }
 
     private fun getNetworkDataSourceFactory(okHttpClient: OkHttpClient?): DataSource.Factory {
@@ -296,17 +281,6 @@ class ExoPlayerWrapper private constructor(
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    private fun lifecycleOnStart() {
-        player.playWhenReady = wasPlaying
-        playerView?.onResume()
-    }
-
-    private fun lifecycleOnStop() {
-        wasPlaying = player.playWhenReady
-        player.pause()
-        playerView?.onPause()
     }
 
     fun release() {
@@ -457,6 +431,90 @@ class ExoPlayerWrapper private constructor(
         player.stop()
     }
 
+    // lifecycle listener methods
+    override fun onStart(owner: LifecycleOwner) {
+        player.playWhenReady = wasPlaying
+        playerView?.onResume()
+        super.onStart(owner)
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        wasPlaying = player.playWhenReady
+        player.pause()
+        playerView?.onPause()
+        super.onStop(owner)
+    }
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        release()
+        super.onDestroy(owner)
+    }
+
+    // exoplayer listener methods
+    override fun onPlayerError(error: PlaybackException) {
+        handlePlayerError(error)
+    }
+
+    override fun onTracksChanged(
+        trackGroups: TrackGroupArray,
+        trackSelections: TrackSelectionArray
+    ) {
+        handleTracksChanged(trackGroups)
+    }
+
+    override fun onPlaybackStateChanged(state: Int) {
+        if (state == Player.STATE_READY && noInternetErrorShowing) {
+            noInternetErrorShowing = false
+            connectionListener?.onConnectionReturned()
+        }
+    }
+
+    private fun handlePlayerError(error: PlaybackException) {
+        when (error.errorCode) {
+            PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW,
+            PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS,
+            PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND,
+            PlaybackException.ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE,
+            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
+            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT,
+            PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
+            PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED,
+            PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED,
+            PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED,
+            PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED,
+            PlaybackException.ERROR_CODE_REMOTE_ERROR,
+            PlaybackException.ERROR_CODE_TIMEOUT,
+            PlaybackException.ERROR_CODE_UNSPECIFIED -> reloadCurrentMedia()
+            else -> error.printStackTrace()
+        }
+    }
+
+    fun handleTracksChanged(trackGroups: TrackGroupArray) {
+        var textFound = false
+        var audioFound = false
+        var videoFound = false
+        for (i in 0 until trackGroups.length) {
+            for (g in 0 until trackGroups[i].length) {
+                trackGroups[i].getFormat(g).sampleMimeType.let {
+                    when {
+                        MimeTypes.isAudio(it) -> {
+                            audioFound = true
+                        }
+                        MimeTypes.isText(it) -> {
+                            textFound = true
+                        }
+                        MimeTypes.isVideo(it) -> {
+                            videoFound = true
+                        }
+                    }
+                }
+            }
+        }
+        btnSelectAudioTrack?.visibility = if (audioFound) View.VISIBLE else View.INVISIBLE
+        btnSelectSubtitleTrack?.visibility = if (textFound) View.VISIBLE else View.INVISIBLE
+        btnSelectVideoTrack?.visibility = if (videoFound) View.VISIBLE else View.INVISIBLE
+    }
+
     class Builder {
         private val ctx: Context
         private var listener: Player.Listener? = null
@@ -593,63 +651,5 @@ class ExoPlayerWrapper private constructor(
                 okHttpClient
             )
         }
-    }
-
-    interface ConnectionListener {
-        fun onConnectionError()
-        fun onConnectionReturned()
-    }
-
-    private inner class ExoPlayerWrapperEventListener : Player.Listener {
-        override fun onPlayerError(error: PlaybackException) {
-            handlePlayerError(error)
-        }
-
-        override fun onTracksChanged(
-            trackGroups: TrackGroupArray,
-            trackSelections: TrackSelectionArray
-        ) {
-            handleTracksChanged(trackGroups)
-        }
-
-        override fun onPlaybackStateChanged(state: Int) {
-            if (state == Player.STATE_READY && noInternetErrorShowing) {
-                noInternetErrorShowing = false
-                connectionListener?.onConnectionReturned()
-            }
-        }
-    }
-
-    private fun handlePlayerError(error: PlaybackException) {
-        when (error.errorCode) {
-            PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW, PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS, PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND, PlaybackException.ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE, PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED, PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT, PlaybackException.ERROR_CODE_IO_UNSPECIFIED, PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED, PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED, PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED, PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED, PlaybackException.ERROR_CODE_REMOTE_ERROR, PlaybackException.ERROR_CODE_TIMEOUT, PlaybackException.ERROR_CODE_UNSPECIFIED -> reloadCurrentMedia()
-            else -> error.printStackTrace()
-        }
-    }
-
-    fun handleTracksChanged(trackGroups: TrackGroupArray) {
-        var textFound = false
-        var audioFound = false
-        var videoFound = false
-        for (i in 0 until trackGroups.length) {
-            for (g in 0 until trackGroups[i].length) {
-                trackGroups[i].getFormat(g).sampleMimeType.let {
-                    when {
-                        MimeTypes.isAudio(it) -> {
-                            audioFound = true
-                        }
-                        MimeTypes.isText(it) -> {
-                            textFound = true
-                        }
-                        MimeTypes.isVideo(it) -> {
-                            videoFound = true
-                        }
-                    }
-                }
-            }
-        }
-        btnSelectAudioTrack?.visibility = if (audioFound) View.VISIBLE else View.INVISIBLE
-        btnSelectSubtitleTrack?.visibility = if (textFound) View.VISIBLE else View.INVISIBLE
-        btnSelectVideoTrack?.visibility = if (videoFound) View.VISIBLE else View.INVISIBLE
     }
 }

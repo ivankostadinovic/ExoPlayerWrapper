@@ -7,6 +7,7 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.exoplayer2.DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.ivankostadinovic.exoplayerwrapper.ConnectionListener
 import com.ivankostadinovic.exoplayerwrapper.ExoPlayerWrapper
 import com.ivankostadinovic.exoplayerwrapper.sample.databinding.ActivitySampleBinding
 import okhttp3.OkHttpClient
@@ -73,8 +74,8 @@ class SampleActivity : AppCompatActivity() {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
     }
 
-    private fun getConnectionListener(): ExoPlayerWrapper.ConnectionListener {
-        return object : ExoPlayerWrapper.ConnectionListener {
+    private fun getConnectionListener(): ConnectionListener {
+        return object : ConnectionListener {
             override fun onConnectionError() {
                 showMsg(getString(R.string.connection_error))
             }
