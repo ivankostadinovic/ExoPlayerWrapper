@@ -10,19 +10,16 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.DefaultRenderersFactory.ExtensionRendererMode
-import com.google.android.exoplayer2.LoadControl
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
 import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -67,8 +64,8 @@ class ExoPlayerWrapper private constructor(
     private val btnSelectVideoTrack: View?,
     private val btnSelectSubtitleTrack: View?,
     private val okHttpClient: OkHttpClient?
-) : LifecycleObserver {
-    val player: SimpleExoPlayer
+) : DefaultLifecycleObserver {
+    val player: ExoPlayer
     val hlsFactory: HlsMediaSource.Factory
     val dashFactory: DashMediaSource.Factory
     val progressiveFactory: ProgressiveMediaSource.Factory
@@ -151,7 +148,7 @@ class ExoPlayerWrapper private constructor(
         rtspFactory = RtspMediaSource.Factory()
             .setLoadErrorHandlingPolicy(errorHandlingPolicy)
 
-        val loadControl: LoadControl = DefaultLoadControl.Builder()
+        val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
                 DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
                 DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
@@ -161,7 +158,7 @@ class ExoPlayerWrapper private constructor(
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
 
-        player = SimpleExoPlayer.Builder(ctx, defaultRenderersFactory)
+        player = ExoPlayer.Builder(ctx, defaultRenderersFactory)
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
             .setReleaseTimeoutMs(5000) // sometimes releasing player takes a bit longer and would cause errors in the background
@@ -193,19 +190,19 @@ class ExoPlayerWrapper private constructor(
         setUpInternetListener()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun lifecycleOnStart() {
-        onStart()
+    override fun onStart(owner: LifecycleOwner) {
+        lifecycleOnStart()
+        super.onStart(owner)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun lifecycleOnStop() {
-        onStop()
+    override fun onStop(owner: LifecycleOwner) {
+        lifecycleOnStop()
+        super.onStop(owner)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun lifecycleOnDestroy() {
+    override fun onDestroy(owner: LifecycleOwner) {
         release()
+        super.onDestroy(owner)
     }
 
     private fun getNetworkDataSourceFactory(okHttpClient: OkHttpClient?): DataSource.Factory {
@@ -297,12 +294,12 @@ class ExoPlayerWrapper private constructor(
         }
     }
 
-    private fun onStart() {
+    private fun lifecycleOnStart() {
         player.playWhenReady = wasPlaying
         playerView?.onResume()
     }
 
-    private fun onStop() {
+    private fun lifecycleOnStop() {
         wasPlaying = player.playWhenReady
         player.pause()
         playerView?.onPause()
@@ -633,12 +630,16 @@ class ExoPlayerWrapper private constructor(
         for (i in 0 until trackGroups.length) {
             for (g in 0 until trackGroups[i].length) {
                 trackGroups[i].getFormat(g).sampleMimeType.let {
-                    if (MimeTypes.isAudio(it)) {
-                        audioFound = true
-                    } else if (MimeTypes.isText(it)) {
-                        textFound = true
-                    } else if (MimeTypes.isVideo(it)) {
-                        videoFound = true
+                    when {
+                        MimeTypes.isAudio(it) -> {
+                            audioFound = true
+                        }
+                        MimeTypes.isText(it) -> {
+                            textFound = true
+                        }
+                        MimeTypes.isVideo(it) -> {
+                            videoFound = true
+                        }
                     }
                 }
             }
