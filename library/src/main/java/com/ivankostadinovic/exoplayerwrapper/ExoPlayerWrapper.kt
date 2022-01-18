@@ -77,8 +77,8 @@ class ExoPlayerWrapper private constructor(
     var wasPlaying = true
     var noInternetErrorShowing = false
 
-    lateinit var currentMediaSource: MediaSource
-    lateinit var currentMediaUri: Uri
+    var currentMediaSource: MediaSource? = null
+    var currentMediaUri: Uri? = null
 
     private lateinit var networkRequest: NetworkRequest
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
@@ -385,18 +385,22 @@ class ExoPlayerWrapper private constructor(
     fun playMedia(uri: Uri, tag: Any? = null) {
         currentMediaUri = uri
         currentMediaSource = getMediaSource(uri, tag)
-        player.setMediaSource(currentMediaSource)
-        player.prepare()
-        player.play()
+        currentMediaSource?.let {
+            player.setMediaSource(it)
+            player.prepare()
+            player.play()
+        }
     }
 
     /**
      * Reload the currently playing media
      */
     fun reloadCurrentMedia() {
-        player.setMediaSource(currentMediaSource)
-        player.prepare()
-        player.play()
+        currentMediaSource?.let {
+            player.setMediaSource(it)
+            player.prepare()
+            player.play()
+        }
     }
 
     private fun getMediaSource(uri: Uri, tag: Any?): MediaSource {
@@ -433,6 +437,9 @@ class ExoPlayerWrapper private constructor(
 
     // lifecycle listener methods
     override fun onStart(owner: LifecycleOwner) {
+        if (currentMediaSource == null) {
+            return
+        }
         player.prepare()
         player.playWhenReady = wasPlaying
         playerView?.onResume()
