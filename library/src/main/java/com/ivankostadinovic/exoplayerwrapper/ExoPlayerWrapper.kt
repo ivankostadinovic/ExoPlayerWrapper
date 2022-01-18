@@ -65,6 +65,11 @@ class ExoPlayerWrapper private constructor(
     private val btnSelectSubtitleTrack: View?,
     private val okHttpClient: OkHttpClient?
 ) : DefaultLifecycleObserver, Player.Listener {
+
+    companion object {
+        const val UNDEFINED: Long = -1
+    }
+
     val player: ExoPlayer
     val hlsFactory: HlsMediaSource.Factory
     val dashFactory: DashMediaSource.Factory
@@ -79,6 +84,7 @@ class ExoPlayerWrapper private constructor(
 
     var currentMediaSource: MediaSource? = null
     var currentMediaUri: Uri? = null
+    var currentPosition = UNDEFINED
 
     private lateinit var networkRequest: NetworkRequest
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
@@ -471,9 +477,15 @@ class ExoPlayerWrapper private constructor(
     }
 
     override fun onPlaybackStateChanged(state: Int) {
-        if (state == Player.STATE_READY && noInternetErrorShowing) {
-            noInternetErrorShowing = false
-            connectionListener?.onConnectionReturned()
+        if (state == Player.STATE_READY) {
+            if (noInternetErrorShowing) {
+                noInternetErrorShowing = false
+                connectionListener?.onConnectionReturned()
+            }
+            if (currentPosition != UNDEFINED) {
+                player.seekTo(currentPosition)
+                currentPosition = UNDEFINED
+            }
         }
     }
 
@@ -492,7 +504,9 @@ class ExoPlayerWrapper private constructor(
             PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED,
             PlaybackException.ERROR_CODE_REMOTE_ERROR,
             PlaybackException.ERROR_CODE_TIMEOUT,
-            PlaybackException.ERROR_CODE_UNSPECIFIED -> reloadCurrentMedia()
+            PlaybackException.ERROR_CODE_UNSPECIFIED -> {
+                currentPosition = player.contentPosition
+            }
             else -> error.printStackTrace()
         }
     }
