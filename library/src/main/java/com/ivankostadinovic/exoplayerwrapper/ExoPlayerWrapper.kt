@@ -433,6 +433,7 @@ class ExoPlayerWrapper private constructor(
 
     // lifecycle listener methods
     override fun onStart(owner: LifecycleOwner) {
+        player.prepare()
         player.playWhenReady = wasPlaying
         playerView?.onResume()
         super.onStart(owner)
@@ -440,7 +441,7 @@ class ExoPlayerWrapper private constructor(
 
     override fun onStop(owner: LifecycleOwner) {
         wasPlaying = player.playWhenReady
-        player.pause()
+        player.stop()
         playerView?.onPause()
         super.onStop(owner)
     }
