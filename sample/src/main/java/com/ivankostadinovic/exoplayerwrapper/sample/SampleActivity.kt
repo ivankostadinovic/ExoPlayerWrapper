@@ -10,6 +10,7 @@ import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.ivankostadinovic.exoplayerwrapper.ConnectionListener
 import com.ivankostadinovic.exoplayerwrapper.ExoPlayerWrapper
+import com.ivankostadinovic.exoplayerwrapper.helper.is403Forbidden
 import com.ivankostadinovic.exoplayerwrapper.sample.databinding.ActivitySampleBinding
 import okhttp3.OkHttpClient
 
@@ -17,7 +18,7 @@ class SampleActivity : AppCompatActivity() {
     lateinit var playerWrapper: ExoPlayerWrapper
     lateinit var binding: ActivitySampleBinding
 
-    private val streamUrl = ""
+    private var streamUrl = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +72,10 @@ class SampleActivity : AppCompatActivity() {
 
             override fun onPlayerError(error: PlaybackException) {
                 super.onPlayerError(error)
+                if(error.is403Forbidden()) {
+                    streamUrl = ""
+                    playMedia()
+                }
             }
         }
     }

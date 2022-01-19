@@ -44,6 +44,7 @@ import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorI
 import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.util.Util
+import com.ivankostadinovic.exoplayerwrapper.helper.is403Forbidden
 import okhttp3.OkHttpClient
 
 /**
@@ -84,12 +85,13 @@ class ExoPlayerWrapper private constructor(
 
     var currentMediaSource: MediaSource? = null
     var currentMediaUri: Uri? = null
-    var currentPosition = UNDEFINED
+    var positionWhenErrorOcurred = UNDEFINED
 
     private lateinit var networkRequest: NetworkRequest
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
 
     init {
+
         if (handleLifecycleEvents) {
             lifecycleOwner?.lifecycle?.addObserver(this)
         }
@@ -193,11 +195,11 @@ class ExoPlayerWrapper private constructor(
             player.addAnalyticsListener(EventLogger(trackSelector))
         }
 
+        player.addListener(this)
         listener?.let {
             player.addListener(it)
         }
 
-        player.addListener(this)
         setUpInternetListener()
     }
 
@@ -389,13 +391,17 @@ class ExoPlayerWrapper private constructor(
      * @param tag optional tag for Player analytics
      */
     fun playMedia(uri: Uri, tag: Any? = null) {
+        if (positionWhenErrorOcurred != UNDEFINED && !onlyTokenChanged(uri)) {
+            positionWhenErrorOcurred = UNDEFINED
+        }
         currentMediaUri = uri
         currentMediaSource = getMediaSource(uri, tag)
-        currentMediaSource?.let {
-            player.setMediaSource(it)
-            player.prepare()
-            player.play()
-        }
+        reloadCurrentMedia()
+    }
+
+    private fun onlyTokenChanged(uri: Uri?): Boolean {
+        return uri.toString().substringBeforeLast("token=") ==
+            currentMediaUri.toString().substringBeforeLast("token=")
     }
 
     /**
@@ -482,9 +488,9 @@ class ExoPlayerWrapper private constructor(
                 noInternetErrorShowing = false
                 connectionListener?.onConnectionReturned()
             }
-            if (currentPosition != UNDEFINED) {
-                player.seekTo(currentPosition)
-                currentPosition = UNDEFINED
+            if (positionWhenErrorOcurred != UNDEFINED) {
+                positionWhenErrorOcurred = UNDEFINED
+                player.seekTo(positionWhenErrorOcurred)
             }
         }
     }
@@ -505,7 +511,10 @@ class ExoPlayerWrapper private constructor(
             PlaybackException.ERROR_CODE_REMOTE_ERROR,
             PlaybackException.ERROR_CODE_TIMEOUT,
             PlaybackException.ERROR_CODE_UNSPECIFIED -> {
-                currentPosition = player.contentPosition
+                positionWhenErrorOcurred = player.contentPosition
+                if (error.is403Forbidden()) {
+                    return
+                }
                 reloadCurrentMedia()
             }
             else -> error.printStackTrace()
