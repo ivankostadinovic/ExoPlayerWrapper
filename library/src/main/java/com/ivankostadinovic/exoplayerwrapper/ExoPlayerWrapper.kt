@@ -506,6 +506,7 @@ class ExoPlayerWrapper private constructor(
             PlaybackException.ERROR_CODE_TIMEOUT,
             PlaybackException.ERROR_CODE_UNSPECIFIED -> {
                 currentPosition = player.contentPosition
+                reloadCurrentMedia()
             }
             else -> error.printStackTrace()
         }

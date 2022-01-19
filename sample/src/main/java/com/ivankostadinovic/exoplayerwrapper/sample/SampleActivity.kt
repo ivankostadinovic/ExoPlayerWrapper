@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.google.android.exoplayer2.DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.ivankostadinovic.exoplayerwrapper.ConnectionListener
 import com.ivankostadinovic.exoplayerwrapper.ExoPlayerWrapper
@@ -66,6 +67,10 @@ class SampleActivity : AppCompatActivity() {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 super.onMediaItemTransition(mediaItem, reason)
                 showMsg(getString(R.string.media_item_transition))
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                super.onPlayerError(error)
             }
         }
     }
