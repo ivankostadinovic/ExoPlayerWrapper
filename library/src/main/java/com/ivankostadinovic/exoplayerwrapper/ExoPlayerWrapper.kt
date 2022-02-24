@@ -34,10 +34,10 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.CaptionStyleCompat
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.ui.TrackSelectionDialogBuilder
 import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy
 import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorInfo
@@ -57,7 +57,7 @@ class ExoPlayerWrapper private constructor(
     private val handleLifecycleEvents: Boolean,
     private val lifecycleOwner: LifecycleOwner?,
     private val extensionRendererMode: Int,
-    private val playerView: PlayerView?,
+    private val playerView: StyledPlayerView?,
     private val listener: Player.Listener?,
     private val connectionListener: ConnectionListener?,
     private val preferredTrackLanguage: String?,
@@ -91,7 +91,6 @@ class ExoPlayerWrapper private constructor(
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
 
     init {
-
         if (handleLifecycleEvents) {
             lifecycleOwner?.lifecycle?.addObserver(this)
         }
@@ -104,9 +103,8 @@ class ExoPlayerWrapper private constructor(
             )
         }
 
-        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
+        val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(
             ctx,
-            null,
             getNetworkDataSourceFactory(okHttpClient)
         )
 
@@ -554,7 +552,7 @@ class ExoPlayerWrapper private constructor(
         private var btnSelectAudioTrack: View? = null
         private var btnSelectVideoTrack: View? = null
         private var btnSelectSubtitleTrack: View? = null
-        private var playerView: PlayerView? = null
+        private var playerView: StyledPlayerView? = null
         private var connectionListener: ConnectionListener? = null
         private var lifecycleOwner: LifecycleOwner? = null
         private var handleLifecycleEvents = false
@@ -575,7 +573,7 @@ class ExoPlayerWrapper private constructor(
          */
         constructor(
             ctx: Context,
-            playerView: PlayerView?
+            playerView: StyledPlayerView?
         ) {
             this.ctx = ctx
             this.playerView = playerView
@@ -585,7 +583,7 @@ class ExoPlayerWrapper private constructor(
          * @param extensionRendererMode extension renderer mode
          * @return builder, for convenience
          */
-        fun setExtensionRendererMode(@ExtensionRendererMode extensionRendererMode: Int): Builder {
+        fun setExtensionRendererMode(extensionRendererMode: @ExtensionRendererMode Int): Builder {
             this.extensionRendererMode = extensionRendererMode
             return this
         }
