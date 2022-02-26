@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.21" />
+        <entry key="../../.gradle/caches/transforms-3/6d0aed067dcf1f1a40b65fd9c3423159/transformed/exoplayer-ui-2.17.0/res/layout/exo_player_control_view.xml" value="0.29791666666666666" />
         <entry key="..\:/Projects/ExoPlayerWrapper/library/src/main/res/layout/activity_test.xml" value="0.21354166666666666" />
         <entry key="..\:/Projects/ExoPlayerWrapper/sample/src/main/res/layout/activity_sample.xml" value="0.21354166666666666" />
+        <entry key="sample/src/main/res/layout/activity_sample.xml" value="0.29791666666666666" />
       </map>
     </option>
   </component>

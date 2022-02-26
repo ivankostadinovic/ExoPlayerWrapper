@@ -34,6 +34,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.CaptionStyleCompat
+import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.ui.TrackSelectionDialogBuilder
 import com.google.android.exoplayer2.upstream.DataSource
@@ -57,7 +58,7 @@ class ExoPlayerWrapper private constructor(
     private val handleLifecycleEvents: Boolean,
     private val lifecycleOwner: LifecycleOwner?,
     private val extensionRendererMode: Int,
-    private val playerView: StyledPlayerView?,
+    private val playerView: PlayerView?,
     private val listener: Player.Listener?,
     private val connectionListener: ConnectionListener?,
     private val preferredTrackLanguage: String?,
@@ -552,7 +553,7 @@ class ExoPlayerWrapper private constructor(
         private var btnSelectAudioTrack: View? = null
         private var btnSelectVideoTrack: View? = null
         private var btnSelectSubtitleTrack: View? = null
-        private var playerView: StyledPlayerView? = null
+        private var playerView: PlayerView? = null
         private var connectionListener: ConnectionListener? = null
         private var lifecycleOwner: LifecycleOwner? = null
         private var handleLifecycleEvents = false
@@ -573,7 +574,7 @@ class ExoPlayerWrapper private constructor(
          */
         constructor(
             ctx: Context,
-            playerView: StyledPlayerView?
+            playerView: PlayerView?
         ) {
             this.ctx = ctx
             this.playerView = playerView
