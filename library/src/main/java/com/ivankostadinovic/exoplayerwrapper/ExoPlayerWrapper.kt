@@ -123,13 +123,8 @@ class ExoPlayerWrapper private constructor(
         val errorHandlingPolicy: DefaultLoadErrorHandlingPolicy =
             object : DefaultLoadErrorHandlingPolicy() {
                 override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorInfo): Long {
-                    return if (!handleInternetError()) {
-                        1000 // if there is a connection error continue reloading the media
-                    } else C.TIME_UNSET
-                }
-
-                override fun getMinimumLoadableRetryCount(dataType: Int): Int {
-                    return Int.MAX_VALUE
+                    handleInternetError()
+                    return super.getRetryDelayMsFor(loadErrorInfo)
                 }
             }
 
