@@ -483,8 +483,8 @@ class ExoPlayerWrapper private constructor(
                 connectionListener?.onConnectionReturned()
             }
             if (positionWhenErrorOcurred != UNDEFINED) {
-                positionWhenErrorOcurred = UNDEFINED
                 player.seekTo(positionWhenErrorOcurred)
+                positionWhenErrorOcurred = UNDEFINED
             }
         }
     }
