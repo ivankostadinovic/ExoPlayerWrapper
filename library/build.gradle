@@ -36,7 +36,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.ivankostadinovic'
                 artifactId = 'ExoPlayerWrapper'
-                version = '2.17.0.0'
+                version = '2.17.1.0'
             }
         }
     }
