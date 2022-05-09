@@ -13,6 +13,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.C.DEFAULT_SEEK_BACK_INCREMENT_MS
+import com.google.android.exoplayer2.C.DEFAULT_SEEK_FORWARD_INCREMENT_MS
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.DefaultRenderersFactory.ExtensionRendererMode
@@ -64,7 +66,9 @@ class ExoPlayerWrapper private constructor(
     private val btnSelectAudioTrack: View?,
     private val btnSelectVideoTrack: View?,
     private val btnSelectSubtitleTrack: View?,
-    private val okHttpClient: OkHttpClient?
+    private val okHttpClient: OkHttpClient?,
+    private val seekForwardIncrementMs: Long,
+    private val seekBackwardIncrementMs: Long
 ) : DefaultLifecycleObserver, Player.Listener {
 
     companion object {
@@ -167,6 +171,8 @@ class ExoPlayerWrapper private constructor(
         player = ExoPlayer.Builder(ctx, defaultRenderersFactory)
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
+            .setSeekForwardIncrementMs(seekForwardIncrementMs)
+            .setSeekBackIncrementMs(seekBackwardIncrementMs)
             .setReleaseTimeoutMs(5000) // sometimes releasing player takes a bit longer and would cause errors in the background
             .build()
 
@@ -554,6 +560,8 @@ class ExoPlayerWrapper private constructor(
         private var extensionRendererMode = DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF
         private var loggingEnabled = false
         private var okHttpClient: OkHttpClient? = null
+        private var seekForwardIncrementMs: Long = DEFAULT_SEEK_FORWARD_INCREMENT_MS
+        private var seekBackwardIncrementMs: Long = DEFAULT_SEEK_BACK_INCREMENT_MS
 
         /**
          * @param ctx Context that will be used to initialize the player
@@ -659,6 +667,20 @@ class ExoPlayerWrapper private constructor(
             return this
         }
 
+        /**
+         * @param seekForwardIncrementMs forwardIncrementMs for seekbar
+         * @param seekBackwardIncrementMs backwardIncrementMs for seekbar
+         * @return builder, for convenience
+         */
+        fun setForwardBackwardIncrementMs(
+            seekForwardIncrementMs: Long,
+            seekBackwardIncrementMs: Long
+        ): Builder {
+            this.seekForwardIncrementMs = seekForwardIncrementMs
+            this.seekBackwardIncrementMs = seekBackwardIncrementMs
+            return this
+        }
+
         fun build(): ExoPlayerWrapper {
             return ExoPlayerWrapper(
                 ctx,
@@ -673,7 +695,9 @@ class ExoPlayerWrapper private constructor(
                 btnSelectAudioTrack,
                 btnSelectVideoTrack,
                 btnSelectSubtitleTrack,
-                okHttpClient
+                okHttpClient,
+                seekForwardIncrementMs,
+                seekBackwardIncrementMs
             )
         }
     }
