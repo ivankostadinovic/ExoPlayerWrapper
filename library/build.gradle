@@ -19,6 +19,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+    namespace 'com.ivankostadinovic.exoplayerwrapper'
 }
 
 def exoPlayerVersion = '2.17.1'
