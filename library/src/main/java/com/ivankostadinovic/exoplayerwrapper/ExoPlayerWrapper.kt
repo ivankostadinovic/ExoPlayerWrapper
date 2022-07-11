@@ -1,5 +1,6 @@
 package com.ivankostadinovic.exoplayerwrapper
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -22,11 +23,11 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
 import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.source.dash.DashMediaSource
 import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
@@ -34,7 +35,6 @@ import com.google.android.exoplayer2.source.rtsp.RtspMediaSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.ui.TrackSelectionDialogBuilder
@@ -46,6 +46,7 @@ import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorI
 import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.util.Util
+import com.google.common.collect.ImmutableList
 import com.ivankostadinovic.exoplayerwrapper.helper.is403Forbidden
 import okhttp3.OkHttpClient
 
@@ -53,6 +54,8 @@ import okhttp3.OkHttpClient
  * An [ExoPlayer] implementation. Instances can be obtained from [ExoPlayerWrapper.Builder].
  */
 @Suppress("unused")
+@SuppressLint("MissingPermission")
+
 class ExoPlayerWrapper private constructor(
     private val ctx: Context,
     private val loggingEnabled: Boolean,
@@ -301,7 +304,7 @@ class ExoPlayerWrapper private constructor(
             TrackSelectionDialogBuilder(
                 ctx,
                 ctx.getString(R.string.select_subtitle_track),
-                trackSelector,
+                player,
                 getRendererIndex(C.TRACK_TYPE_TEXT)
             )
                 .setTheme(R.style.DialogTheme)
@@ -318,7 +321,7 @@ class ExoPlayerWrapper private constructor(
             TrackSelectionDialogBuilder(
                 ctx,
                 ctx.getString(R.string.select_video_track),
-                trackSelector,
+                player,
                 getRendererIndex(C.TRACK_TYPE_VIDEO)
             )
                 .setTheme(R.style.DialogTheme)
@@ -335,7 +338,7 @@ class ExoPlayerWrapper private constructor(
             TrackSelectionDialogBuilder(
                 ctx,
                 ctx.getString(R.string.select_audio_track),
-                trackSelector,
+                player,
                 getRendererIndex(C.TRACK_TYPE_AUDIO)
             )
                 .setTheme(R.style.DialogTheme)
@@ -416,11 +419,11 @@ class ExoPlayerWrapper private constructor(
 
     private fun getMediaSource(uri: Uri, tag: Any?): MediaSource {
         return when (Util.inferContentType(uri)) {
-            C.TYPE_SS -> ssFactory.createMediaSource(createMediaItem(uri, tag))
-            C.TYPE_DASH -> dashFactory.createMediaSource(createMediaItem(uri, tag))
-            C.TYPE_HLS -> hlsFactory.createMediaSource(createMediaItem(uri, tag))
-            C.TYPE_OTHER -> progressiveFactory.createMediaSource(createMediaItem(uri, tag))
-            C.TYPE_RTSP -> rtspFactory.createMediaSource(createMediaItem(uri, tag))
+            C.CONTENT_TYPE_SS -> ssFactory.createMediaSource(createMediaItem(uri, tag))
+            C.CONTENT_TYPE_DASH -> dashFactory.createMediaSource(createMediaItem(uri, tag))
+            C.CONTENT_TYPE_HLS -> hlsFactory.createMediaSource(createMediaItem(uri, tag))
+            C.CONTENT_TYPE_OTHER -> progressiveFactory.createMediaSource(createMediaItem(uri, tag))
+            C.CONTENT_TYPE_RTSP -> rtspFactory.createMediaSource(createMediaItem(uri, tag))
             else -> {
                 hlsFactory.createMediaSource(createMediaItem(uri, tag))
             }
@@ -474,11 +477,9 @@ class ExoPlayerWrapper private constructor(
         handlePlayerError(error)
     }
 
-    override fun onTracksChanged(
-        trackGroups: TrackGroupArray,
-        trackSelections: TrackSelectionArray
-    ) {
-        handleTracksChanged(trackGroups)
+    override fun onTracksChanged(tracks: Tracks) {
+        super.onTracksChanged(tracks)
+        handleTracksChanged(tracks.groups)
     }
 
     override fun onPlaybackStateChanged(state: Int) {
@@ -520,13 +521,13 @@ class ExoPlayerWrapper private constructor(
         }
     }
 
-    fun handleTracksChanged(trackGroups: TrackGroupArray) {
+    fun handleTracksChanged(trackGroups: ImmutableList<Tracks.Group>) {
         var textFound = false
         var audioFound = false
         var videoFound = false
-        for (i in 0 until trackGroups.length) {
+        for (i in 0 until trackGroups.size) {
             for (g in 0 until trackGroups[i].length) {
-                trackGroups[i].getFormat(g).sampleMimeType.let {
+                trackGroups[i].getTrackFormat(g).sampleMimeType.let {
                     when {
                         MimeTypes.isAudio(it) -> {
                             audioFound = true
