@@ -18,7 +18,7 @@ class SampleActivity : AppCompatActivity() {
     lateinit var playerWrapper: ExoPlayerWrapper
     lateinit var binding: ActivitySampleBinding
 
-    private var streamUrl = "https://media.wedflow.co/studio/k61qoz6i/deliverable/ua8mlx58/media/2ie4w0ea/A.mp4"
+    private var streamUrl = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
