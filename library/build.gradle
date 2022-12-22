@@ -2,30 +2,32 @@ plugins {
     id 'com.android.library'
     id 'maven-publish'
     id 'kotlin-android'
-    id "org.jlleitschuh.gradle.ktlint" version "10.2.0"
+    id "org.jlleitschuh.gradle.ktlint" version "11.0.0"
 }
 
 android {
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
-        compileSdkVersion 31
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
+        targetSdkVersion 33
+        compileSdkVersion 33
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+
     namespace 'com.ivankostadinovic.exoplayerwrapper'
 }
 
-def exoPlayerVersion = '2.18.1'
+def exoPlayerVersion = '2.18.2'
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation "com.google.android.exoplayer:extension-okhttp:$exoPlayerVersion"
     api "com.google.android.exoplayer:exoplayer:$exoPlayerVersion"
 }
@@ -37,7 +39,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.ivankostadinovic'
                 artifactId = 'ExoPlayerWrapper'
-                version = '2.18.1.0'
+                version = '2.18.2.0'
             }
         }
     }
