@@ -22,6 +22,12 @@ android {
     }
 
     namespace 'com.ivankostadinovic.exoplayerwrapper'
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
+    }
 }
 
 def exoPlayerVersion = '2.18.2'
@@ -39,7 +45,6 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.ivankostadinovic'
                 artifactId = 'ExoPlayerWrapper'
-                version = '2.18.2.0'
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.ivankostadinovic.exoplayerwrapper
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -54,8 +53,6 @@ import okhttp3.OkHttpClient
  * An [ExoPlayer] implementation. Instances can be obtained from [ExoPlayerWrapper.Builder].
  */
 @Suppress("unused")
-@SuppressLint("MissingPermission")
-
 class ExoPlayerWrapper private constructor(
     private val ctx: Context,
     loggingEnabled: Boolean,
