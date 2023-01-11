@@ -136,7 +136,7 @@ To see the logs from the player, filter the logcat output by "EventLogger". Don'
 ```
 MIT License
 
-Copyright (c) 2021 Ivan Kostadinovic
+Copyright (c) 2023 Ivan Kostadinovic
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
