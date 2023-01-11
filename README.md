@@ -5,7 +5,8 @@ A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) w
 
 
 ## Download
-This library is available in **JitPack** which is the default Maven repository used in Android Studio.
+This library is available in **JitPack** which is the default Maven repository used in Android Studio. 
+You don't need to add a dependency to ExoPlayer separately as this library exposes it.
 
 **Step 1.** Add it in your root build.gradle at the end of repositories
 ```Gradle
