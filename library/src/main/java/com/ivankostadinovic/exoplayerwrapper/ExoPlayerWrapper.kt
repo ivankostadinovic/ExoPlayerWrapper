@@ -58,20 +58,21 @@ import okhttp3.OkHttpClient
 
 class ExoPlayerWrapper private constructor(
     private val ctx: Context,
-    private val loggingEnabled: Boolean,
-    private val handleLifecycleEvents: Boolean,
-    private val lifecycleOwner: LifecycleOwner?,
-    private val extensionRendererMode: Int,
+    loggingEnabled: Boolean,
+    handleLifecycleEvents: Boolean,
+    lifecycleOwner: LifecycleOwner?,
+    extensionRendererMode: Int,
+    @Suppress("deprecation")
     private val playerView: PlayerView?,
-    private val listener: Player.Listener?,
+    listener: Player.Listener?,
     private val connectionListener: ConnectionListener?,
-    private val preferredTrackLanguage: String?,
+    preferredTrackLanguage: String?,
     private val btnSelectAudioTrack: View?,
     private val btnSelectVideoTrack: View?,
     private val btnSelectSubtitleTrack: View?,
-    private val okHttpClient: OkHttpClient?,
-    private val seekForwardIncrementMs: Long,
-    private val seekBackwardIncrementMs: Long
+    okHttpClient: OkHttpClient?,
+    seekForwardIncrementMs: Long,
+    seekBackwardIncrementMs: Long
 ) : DefaultLifecycleObserver, Player.Listener {
 
     companion object {
@@ -194,7 +195,7 @@ class ExoPlayerWrapper private constructor(
         }
 
         if (loggingEnabled) {
-            player.addAnalyticsListener(EventLogger(trackSelector))
+            player.addAnalyticsListener(EventLogger())
         }
 
         player.addListener(this)
@@ -255,6 +256,7 @@ class ExoPlayerWrapper private constructor(
         Handler(Looper.getMainLooper()).post(runnable)
     }
 
+    @Suppress("deprecation")
     private fun isNetworkAvailable(): Boolean {
         val activeNetworkInfo = getConnectivityManager()?.activeNetworkInfo
         return activeNetworkInfo?.isConnected ?: false
@@ -521,7 +523,7 @@ class ExoPlayerWrapper private constructor(
         }
     }
 
-    fun handleTracksChanged(trackGroups: ImmutableList<Tracks.Group>) {
+    private fun handleTracksChanged(trackGroups: ImmutableList<Tracks.Group>) {
         var textFound = false
         var audioFound = false
         var videoFound = false
@@ -554,6 +556,7 @@ class ExoPlayerWrapper private constructor(
         private var btnSelectAudioTrack: View? = null
         private var btnSelectVideoTrack: View? = null
         private var btnSelectSubtitleTrack: View? = null
+        @Suppress("deprecation")
         private var playerView: PlayerView? = null
         private var connectionListener: ConnectionListener? = null
         private var lifecycleOwner: LifecycleOwner? = null
@@ -577,6 +580,7 @@ class ExoPlayerWrapper private constructor(
          */
         constructor(
             ctx: Context,
+            @Suppress("deprecation")
             playerView: PlayerView?
         ) {
             this.ctx = ctx
