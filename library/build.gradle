@@ -33,7 +33,7 @@ android {
 def exoPlayerVersion = '2.18.2'
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation "com.google.android.exoplayer:extension-okhttp:$exoPlayerVersion"
     api "com.google.android.exoplayer:exoplayer:$exoPlayerVersion"
 }
