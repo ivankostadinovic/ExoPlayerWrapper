@@ -7,7 +7,7 @@ import android.net.NetworkRequest
 import android.os.Build
 
 
-object Utils {
+internal object Utils {
 
     @Suppress("deprecation")
     fun isInternetAvailable(context: Context): Boolean {
