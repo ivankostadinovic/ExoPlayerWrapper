@@ -3,7 +3,6 @@ package com.ivankostadinovic.exoplayerwrapper
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Handler
@@ -46,6 +45,7 @@ import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.util.Util
 import com.google.common.collect.ImmutableList
+import com.ivankostadinovic.exoplayerwrapper.helper.Utils
 import com.ivankostadinovic.exoplayerwrapper.helper.is403Forbidden
 import okhttp3.OkHttpClient
 
@@ -226,7 +226,7 @@ class ExoPlayerWrapper private constructor(
 
     private fun handleInternetError(): Boolean {
         return try {
-            if (isNetworkAvailable()) {
+            if (Utils.isInternetAvailable(ctx)) {
                 true
             } else {
                 connectionListener?.let {
@@ -253,18 +253,8 @@ class ExoPlayerWrapper private constructor(
         Handler(Looper.getMainLooper()).post(runnable)
     }
 
-    @Suppress("deprecation")
-    private fun isNetworkAvailable(): Boolean {
-        val activeNetworkInfo = getConnectivityManager()?.activeNetworkInfo
-        return activeNetworkInfo?.isConnected ?: false
-    }
-
     private fun setUpInternetListener() {
-        networkRequest = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-            .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
-            .build()
+        networkRequest = Utils.getNetworkRequest()
 
         networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
