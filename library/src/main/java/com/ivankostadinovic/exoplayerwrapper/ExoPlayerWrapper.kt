@@ -543,6 +543,7 @@ class ExoPlayerWrapper private constructor(
         private var btnSelectAudioTrack: View? = null
         private var btnSelectVideoTrack: View? = null
         private var btnSelectSubtitleTrack: View? = null
+
         @Suppress("deprecation")
         private var playerView: PlayerView? = null
         private var connectionListener: ConnectionListener? = null

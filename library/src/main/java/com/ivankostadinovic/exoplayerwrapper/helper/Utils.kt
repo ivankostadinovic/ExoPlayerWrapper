@@ -6,7 +6,6 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
 
-
 internal object Utils {
 
     @Suppress("deprecation")
