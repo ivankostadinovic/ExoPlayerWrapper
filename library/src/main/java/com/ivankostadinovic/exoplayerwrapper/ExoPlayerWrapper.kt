@@ -5,10 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.exoplayer2.C
@@ -45,7 +42,11 @@ import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.util.Util
 import com.google.common.collect.ImmutableList
-import com.ivankostadinovic.exoplayerwrapper.helper.Utils
+import com.ivankostadinovic.exoplayerwrapper.helper.Utils.getColor
+import com.ivankostadinovic.exoplayerwrapper.helper.Utils.getConnectivityManager
+import com.ivankostadinovic.exoplayerwrapper.helper.Utils.getNetworkRequest
+import com.ivankostadinovic.exoplayerwrapper.helper.Utils.isInternetAvailable
+import com.ivankostadinovic.exoplayerwrapper.helper.Utils.runOnUiThread
 import com.ivankostadinovic.exoplayerwrapper.helper.is403Forbidden
 import okhttp3.OkHttpClient
 
@@ -226,7 +227,7 @@ class ExoPlayerWrapper private constructor(
 
     private fun handleInternetError(): Boolean {
         return try {
-            if (Utils.isInternetAvailable(ctx)) {
+            if (isInternetAvailable(ctx)) {
                 true
             } else {
                 connectionListener?.let {
@@ -244,17 +245,8 @@ class ExoPlayerWrapper private constructor(
             false
         }
     }
-
-    private fun getColor(colorId: Int): Int {
-        return ContextCompat.getColor(ctx, colorId)
-    }
-
-    private fun runOnUiThread(runnable: Runnable) {
-        Handler(Looper.getMainLooper()).post(runnable)
-    }
-
     private fun setUpInternetListener() {
-        networkRequest = Utils.getNetworkRequest()
+        networkRequest = getNetworkRequest()
 
         networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
@@ -268,11 +260,6 @@ class ExoPlayerWrapper private constructor(
         val cm = getConnectivityManager()
         cm?.registerNetworkCallback(networkRequest, networkCallback)
     }
-
-    private fun getConnectivityManager(): ConnectivityManager? {
-        return ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-    }
-
     private fun unregisterNetworkCallback() {
         try {
             val cm = getConnectivityManager()

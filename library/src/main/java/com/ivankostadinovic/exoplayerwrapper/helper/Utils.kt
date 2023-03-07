@@ -5,6 +5,9 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import androidx.core.content.ContextCompat
 
 internal object Utils {
 
@@ -42,5 +45,17 @@ internal object Utils {
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
             .build()
+    }
+
+    fun getColor(colorId: Int): Int {
+        return ContextCompat.getColor(ctx, colorId)
+    }
+
+    fun runOnUiThread(runnable: Runnable) {
+        Handler(Looper.getMainLooper()).post(runnable)
+    }
+
+    fun getConnectivityManager(): ConnectivityManager? {
+        return ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
     }
 }
