@@ -47,7 +47,7 @@ internal object Utils {
             .build()
     }
 
-    fun getColor(colorId: Int): Int {
+    fun getColor(colorId: Int, ctx: Context): Int {
         return ContextCompat.getColor(ctx, colorId)
     }
 
@@ -55,7 +55,7 @@ internal object Utils {
         Handler(Looper.getMainLooper()).post(runnable)
     }
 
-    fun getConnectivityManager(): ConnectivityManager? {
+    fun getConnectivityManager(ctx: Context): ConnectivityManager? {
         return ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
     }
 }

@@ -182,11 +182,11 @@ class ExoPlayerWrapper private constructor(
             it.player = player
             it.subtitleView?.setStyle(
                 CaptionStyleCompat(
-                    getColor(R.color.subtitle_color), // subtitle text color
-                    getColor(android.R.color.transparent), // subtitle background color
-                    getColor(android.R.color.transparent), // subtitle window color
+                    getColor(R.color.subtitle_color, ctx), // subtitle text color
+                    getColor(android.R.color.transparent, ctx), // subtitle background color
+                    getColor(android.R.color.transparent, ctx), // subtitle window color
                     CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW, // subtitle edge type
-                    getColor(android.R.color.black), // subtitle edge color
+                    getColor(android.R.color.black, ctx), // subtitle edge color
                     null
                 )
             )
@@ -257,12 +257,12 @@ class ExoPlayerWrapper private constructor(
             }
         }
 
-        val cm = getConnectivityManager()
+        val cm = getConnectivityManager(ctx)
         cm?.registerNetworkCallback(networkRequest, networkCallback)
     }
     private fun unregisterNetworkCallback() {
         try {
-            val cm = getConnectivityManager()
+            val cm = getConnectivityManager(ctx)
             cm?.unregisterNetworkCallback(networkCallback)
         } catch (e: Exception) {
             e.printStackTrace()
