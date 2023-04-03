@@ -30,7 +30,7 @@ android {
     }
 }
 
-def exoPlayerVersion = '2.18.4'
+def exoPlayerVersion = '2.18.5'
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -45,7 +45,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.ivankostadinovic'
                 artifactId = 'ExoPlayerWrapper'
-                version = '2.18.4.0'
+                version = '2.18.5.0'
             }
         }
     }
