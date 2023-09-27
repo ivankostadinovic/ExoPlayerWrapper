@@ -12,8 +12,8 @@ android {
     defaultConfig {
         applicationId "com.ivankostadinovic.exoplayerwrapper.sample"
         minSdkVersion 21
-        targetSdkVersion 33
-        compileSdkVersion 33
+        targetSdk 33
+        compileSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -27,11 +27,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = "11"
     }
     namespace 'com.ivankostadinovic.exoplayerwrapper.sample'
 }
