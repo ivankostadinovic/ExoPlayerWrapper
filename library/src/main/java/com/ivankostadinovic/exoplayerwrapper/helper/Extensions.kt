@@ -1,6 +1,6 @@
 package com.ivankostadinovic.exoplayerwrapper.helper
 
-import com.google.android.exoplayer2.PlaybackException
+import androidx.media3.common.PlaybackException
 
 fun PlaybackException.is403Forbidden(): Boolean {
     return this.cause?.message?.contains("403") == true

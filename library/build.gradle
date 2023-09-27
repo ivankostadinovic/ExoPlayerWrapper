@@ -30,12 +30,18 @@ android {
     }
 }
 
-def exoPlayerVersion = '2.19.1'
+def media3Version = '1.1.1'
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation "com.google.android.exoplayer:extension-okhttp:$exoPlayerVersion"
-    api "com.google.android.exoplayer:exoplayer:$exoPlayerVersion"
+
+    api "androidx.media3:media3-exoplayer:1.1.1"
+    api "androidx.media3:media3-exoplayer-dash:$media3Version"
+    api "androidx.media3:media3-exoplayer-hls:$media3Version"
+    api "androidx.media3:media3-exoplayer-smoothstreaming:$media3Version"
+    api "androidx.media3:media3-exoplayer-rtsp:$media3Version"
+    api "androidx.media3:media3-datasource-okhttp:$media3Version"
+    api "androidx.media3:media3-ui:$media3Version"
 }
 
 afterEvaluate {
@@ -45,7 +51,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.ivankostadinovic'
                 artifactId = 'ExoPlayerWrapper'
-                version = '2.18.5.0'
+                version = '3.1.1.1.0'
             }
         }
     }

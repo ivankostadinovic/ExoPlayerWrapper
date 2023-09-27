@@ -8,39 +8,39 @@ import android.net.Uri
 import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.C.DEFAULT_SEEK_BACK_INCREMENT_MS
-import com.google.android.exoplayer2.C.DEFAULT_SEEK_FORWARD_INCREMENT_MS
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.DefaultRenderersFactory.ExtensionRendererMode
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Tracks
-import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
-import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.dash.DashMediaSource
-import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.source.rtsp.RtspMediaSource
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.trackselection.MappingTrackSelector
-import com.google.android.exoplayer2.ui.CaptionStyleCompat
-import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.ui.TrackSelectionDialogBuilder
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy
-import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorInfo
-import com.google.android.exoplayer2.util.EventLogger
-import com.google.android.exoplayer2.util.MimeTypes
-import com.google.android.exoplayer2.util.Util
+import androidx.media3.common.C
+import androidx.media3.common.C.DEFAULT_SEEK_BACK_INCREMENT_MS
+import androidx.media3.common.C.DEFAULT_SEEK_FORWARD_INCREMENT_MS
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.common.util.Util
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.okhttp.OkHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.dash.DashMediaSource
+import androidx.media3.exoplayer.hls.DefaultHlsExtractorFactory
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.rtsp.RtspMediaSource
+import androidx.media3.exoplayer.smoothstreaming.SsMediaSource
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.trackselection.MappingTrackSelector
+import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
+import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
+import androidx.media3.exoplayer.util.EventLogger
+import androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory
+import androidx.media3.ui.CaptionStyleCompat
+import androidx.media3.ui.PlayerView
+import androidx.media3.ui.TrackSelectionDialogBuilder
 import com.google.common.collect.ImmutableList
 import com.ivankostadinovic.exoplayerwrapper.helper.Utils.getColor
 import com.ivankostadinovic.exoplayerwrapper.helper.Utils.getConnectivityManager
@@ -60,7 +60,6 @@ class ExoPlayerWrapper private constructor(
     handleLifecycleEvents: Boolean,
     lifecycleOwner: LifecycleOwner?,
     extensionRendererMode: Int,
-    @Suppress("deprecation")
     private val playerView: PlayerView?,
     listener: Player.Listener?,
     private val connectionListener: ConnectionListener?,
@@ -127,7 +126,7 @@ class ExoPlayerWrapper private constructor(
 
         val errorHandlingPolicy: DefaultLoadErrorHandlingPolicy =
             object : DefaultLoadErrorHandlingPolicy() {
-                override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorInfo): Long {
+                override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorHandlingPolicy.LoadErrorInfo): Long {
                     handleInternetError()
                     return super.getRetryDelayMsFor(loadErrorInfo)
                 }
@@ -531,7 +530,6 @@ class ExoPlayerWrapper private constructor(
         private var btnSelectVideoTrack: View? = null
         private var btnSelectSubtitleTrack: View? = null
 
-        @Suppress("deprecation")
         private var playerView: PlayerView? = null
         private var connectionListener: ConnectionListener? = null
         private var lifecycleOwner: LifecycleOwner? = null
@@ -555,7 +553,6 @@ class ExoPlayerWrapper private constructor(
          */
         constructor(
             ctx: Context,
-            @Suppress("deprecation")
             playerView: PlayerView?
         ) {
             this.ctx = ctx
@@ -566,7 +563,7 @@ class ExoPlayerWrapper private constructor(
          * @param extensionRendererMode extension renderer mode
          * @return builder, for convenience
          */
-        fun setExtensionRendererMode(extensionRendererMode: @ExtensionRendererMode Int): Builder {
+        fun setExtensionRendererMode(extensionRendererMode: @DefaultRenderersFactory.ExtensionRendererMode Int): Builder {
             this.extensionRendererMode = extensionRendererMode
             return this
         }
