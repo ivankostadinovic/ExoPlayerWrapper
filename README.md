@@ -132,5 +132,5 @@ To see the logs from the player, filter the logcat output by "EventLogger". Don'
 ```
 
 ## Migrating from version 2 to version 3
-The library methods didn't change, but ExoPlayer imports (if you use any) are changed. This could introduce breaking changes, change the imports like described in the [ExoPlayer to Jetpack Media3 migration](https://developer.android.com/guide/topics/media/exoplayer/mappings)https://developer.android.com/guide/topics/media/exoplayer/mappings
+The library methods didn't change, but ExoPlayer imports (if you use any) are changed. This could introduce breaking changes, change the imports like described in the [ExoPlayer to Jetpack Media3 migration](https://developer.android.com/guide/topics/media/exoplayer/mappings)
 
