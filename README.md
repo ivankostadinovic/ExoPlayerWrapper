@@ -1,6 +1,6 @@
 [![](https://jitpack.io/v/ivankostadinovic/ExoPlayerWrapper.svg)](https://jitpack.io/#ivankostadinovic/ExoPlayerWrapper)
 # ExoPlayerWrapper
-A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper. Starting from version 2.15.1.4, the library is rewritten in Kotlin. Example of usage is available in the **sample** module.
+A lifecycle aware easy to use [ExoPlayer](https://github.com/google/ExoPlayer) wrapper. Starting from version 2.15.1.4, the library is rewritten in Kotlin. Starting with version 3.1.1.1.0, the library is migrated to Android Jetpack Media3 components. Example of usage is available in the **sample** module.
 
 
 ## Download
@@ -130,3 +130,7 @@ To see the logs from the player, filter the logcat output by "EventLogger". Don'
 	    .setLoggingEnabled(true)
             .build();
 ```
+
+## Migrating from version 2 to version 3
+The library methods didn't change, but ExoPlayer imports (if you use any) are changed. This could introduce breaking changes, change the imports like described in the [ExoPlayer to Jetpack Media3 migration](https://developer.android.com/guide/topics/media/exoplayer/mappings)https://developer.android.com/guide/topics/media/exoplayer/mappings
+
