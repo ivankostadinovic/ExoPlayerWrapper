@@ -43,11 +43,10 @@ In your XML layout file, declare a player view.
 
 ```xml
 	...
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/player_view"
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/playerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-	...
 ```
 
 ```java
