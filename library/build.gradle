@@ -31,9 +31,12 @@ android {
 }
 
 def media3Version = '1.2.0'
+def lifecycleVersion = '2.6.2'
+def appCompatVersion = '1.6.1'
 
 dependencies {
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.2"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
 
 
     api "androidx.media3:media3-exoplayer:$media3Version"
