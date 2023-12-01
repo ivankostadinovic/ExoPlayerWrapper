@@ -8,8 +8,8 @@ plugins {
 android {
     defaultConfig {
         minSdkVersion 21
-        targetSdk 33
-        compileSdk 33
+        targetSdk 34
+        compileSdk 34
     }
 
     compileOptions {
@@ -30,12 +30,13 @@ android {
     }
 }
 
-def media3Version = '1.1.1'
+def media3Version = '1.2.0'
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation "androidx.lifecycle:lifecycle-runtime:2.6.2"
 
-    api "androidx.media3:media3-exoplayer:1.1.1"
+
+    api "androidx.media3:media3-exoplayer:$media3Version"
     api "androidx.media3:media3-exoplayer-dash:$media3Version"
     api "androidx.media3:media3-exoplayer-hls:$media3Version"
     api "androidx.media3:media3-exoplayer-smoothstreaming:$media3Version"
@@ -51,7 +52,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.ivankostadinovic'
                 artifactId = 'ExoPlayerWrapper'
-                version = '3.1.1.1.0'
+                version = '3.1.2.0.0'
             }
         }
     }

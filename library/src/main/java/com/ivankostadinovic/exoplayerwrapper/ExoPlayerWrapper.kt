@@ -6,6 +6,7 @@ import android.net.Network
 import android.net.NetworkRequest
 import android.net.Uri
 import android.view.View
+import androidx.annotation.OptIn
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.C
@@ -54,6 +55,7 @@ import okhttp3.OkHttpClient
  * An [ExoPlayer] implementation. Instances can be obtained from [ExoPlayerWrapper.Builder].
  */
 @Suppress("unused")
+@OptIn(UnstableApi::class)
 class ExoPlayerWrapper private constructor(
     private val ctx: Context,
     loggingEnabled: Boolean,
