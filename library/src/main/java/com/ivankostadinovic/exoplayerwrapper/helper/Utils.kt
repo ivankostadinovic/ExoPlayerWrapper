@@ -7,7 +7,6 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import androidx.core.content.ContextCompat
 
 internal object Utils {
 
@@ -47,8 +46,9 @@ internal object Utils {
             .build()
     }
 
+    @Suppress("deprecation")
     fun getColor(colorId: Int, ctx: Context): Int {
-        return ContextCompat.getColor(ctx, colorId)
+        return ctx.resources.getColor(colorId)
     }
 
     fun runOnUiThread(runnable: Runnable) {
