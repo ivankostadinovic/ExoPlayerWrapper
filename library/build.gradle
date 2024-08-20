@@ -30,9 +30,9 @@ android {
     }
 }
 
-def media3Version = '1.2.0'
-def lifecycleVersion = '2.6.2'
-def appCompatVersion = '1.6.1'
+def media3Version = '1.4.0'
+def lifecycleVersion = '2.8.4'
+def appCompatVersion = '1.7.0'
 
 dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
