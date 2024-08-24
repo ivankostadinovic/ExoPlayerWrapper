@@ -367,6 +367,7 @@ class ExoPlayerWrapper private constructor(
      */
     fun reloadCurrentMedia() {
         currentMediaSource?.let {
+            player.stop()
             player.setMediaSource(it)
             player.prepare()
             player.play()
