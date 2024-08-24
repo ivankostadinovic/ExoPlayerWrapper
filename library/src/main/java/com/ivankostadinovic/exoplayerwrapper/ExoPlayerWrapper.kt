@@ -136,16 +136,16 @@ class ExoPlayerWrapper private constructor(
 
             }
 
-//        val defaultHlsExtractorFactory = DefaultHlsExtractorFactory(
-//            DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES,
-//            false
-//        )
+        val defaultHlsExtractorFactory = DefaultHlsExtractorFactory(
+            DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES,
+            false
+        )
 
         hlsFactory = HlsMediaSource
             .Factory(dataSourceFactory)
-            //.setExtractorFactory(defaultHlsExtractorFactory)
+            .setExtractorFactory(defaultHlsExtractorFactory)
             .setLoadErrorHandlingPolicy(errorHandlingPolicy)
-            //.setAllowChunklessPreparation(true)
+            .setAllowChunklessPreparation(true)
 
         progressiveFactory = ProgressiveMediaSource
             .Factory(dataSourceFactory)
