@@ -132,18 +132,20 @@ class ExoPlayerWrapper private constructor(
                     handleInternetError()
                     return super.getRetryDelayMsFor(loadErrorInfo)
                 }
+
+
             }
 
-        val defaultHlsExtractorFactory = DefaultHlsExtractorFactory(
-            DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES,
-            false
-        )
+//        val defaultHlsExtractorFactory = DefaultHlsExtractorFactory(
+//            DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES,
+//            false
+//        )
 
         hlsFactory = HlsMediaSource
             .Factory(dataSourceFactory)
-            .setExtractorFactory(defaultHlsExtractorFactory)
+            //.setExtractorFactory(defaultHlsExtractorFactory)
             .setLoadErrorHandlingPolicy(errorHandlingPolicy)
-            .setAllowChunklessPreparation(true)
+            //.setAllowChunklessPreparation(true)
 
         progressiveFactory = ProgressiveMediaSource
             .Factory(dataSourceFactory)
@@ -161,19 +163,19 @@ class ExoPlayerWrapper private constructor(
             .Factory()
             .setLoadErrorHandlingPolicy(errorHandlingPolicy)
 
-        val loadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(
-                DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
-                DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
-                500,
-                2000
-            )
-            .setPrioritizeTimeOverSizeThresholds(true)
-            .build()
+//        val loadControl = DefaultLoadControl.Builder()
+//            .setBufferDurationsMs(
+//                DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+//                DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+//                500,
+//                2000
+//            )
+//            .setPrioritizeTimeOverSizeThresholds(true)
+//            .build()
 
         player = ExoPlayer.Builder(ctx, defaultRenderersFactory)
             .setTrackSelector(trackSelector)
-            .setLoadControl(loadControl)
+            //.setLoadControl(loadControl)
             .setSeekForwardIncrementMs(seekForwardIncrementMs)
             .setSeekBackIncrementMs(seekBackwardIncrementMs)
             .setReleaseTimeoutMs(5000) // sometimes releasing player takes a bit longer and would cause errors in the background
@@ -206,22 +208,14 @@ class ExoPlayerWrapper private constructor(
     }
 
     private fun getNetworkDataSourceFactory(okHttpClient: OkHttpClient?): DataSource.Factory {
+        val userAgent = Util.getUserAgent(ctx, ctx.packageName)
+
         return if (okHttpClient != null) {
             OkHttpDataSource.Factory(okHttpClient)
-                .setUserAgent(
-                    Util.getUserAgent(
-                        ctx,
-                        ctx.packageName
-                    )
-                )
+                .setUserAgent(userAgent)
         } else {
             DefaultHttpDataSource.Factory()
-                .setUserAgent(
-                    Util.getUserAgent(
-                        ctx,
-                        ctx.packageName
-                    )
-                )
+                .setUserAgent(userAgent)
                 .setAllowCrossProtocolRedirects(true)
         }
     }
@@ -282,7 +276,7 @@ class ExoPlayerWrapper private constructor(
                 ctx,
                 ctx.getString(R.string.select_subtitle_track),
                 player,
-                getRendererIndex(C.TRACK_TYPE_TEXT)
+                C.TRACK_TYPE_TEXT
             )
                 .setTheme(R.style.DialogTheme)
                 .setShowDisableOption(true)
@@ -299,7 +293,7 @@ class ExoPlayerWrapper private constructor(
                 ctx,
                 ctx.getString(R.string.select_video_track),
                 player,
-                getRendererIndex(C.TRACK_TYPE_VIDEO)
+                C.TRACK_TYPE_VIDEO
             )
                 .setTheme(R.style.DialogTheme)
                 .setShowDisableOption(true)
@@ -316,7 +310,7 @@ class ExoPlayerWrapper private constructor(
                 ctx,
                 ctx.getString(R.string.select_audio_track),
                 player,
-                getRendererIndex(C.TRACK_TYPE_AUDIO)
+                C.TRACK_TYPE_AUDIO
             )
                 .setTheme(R.style.DialogTheme)
                 .build()
@@ -324,21 +318,6 @@ class ExoPlayerWrapper private constructor(
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    private fun getRendererIndex(TRACK_TYPE: Int): Int {
-        if (trackSelector.currentMappedTrackInfo == null) {
-            return -1
-        }
-
-        for (i in 0 until player.rendererCount) {
-            if (player.getRendererType(i) == TRACK_TYPE) {
-                if (trackSelector.currentMappedTrackInfo?.getRendererSupport(i) == MappingTrackSelector.MappedTrackInfo.RENDERER_SUPPORT_PLAYABLE_TRACKS) {
-                    return i
-                }
-            }
-        }
-        return -1
     }
 
     /**
@@ -388,6 +367,7 @@ class ExoPlayerWrapper private constructor(
      */
     fun reloadCurrentMedia() {
         currentMediaSource?.let {
+            player.clearMediaItems()
             player.setMediaSource(it)
             player.prepare()
             player.play()
