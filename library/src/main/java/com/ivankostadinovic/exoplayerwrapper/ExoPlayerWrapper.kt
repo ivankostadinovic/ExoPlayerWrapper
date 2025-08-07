@@ -7,6 +7,7 @@ import android.net.NetworkRequest
 import android.net.Uri
 import android.view.View
 import androidx.annotation.OptIn
+import androidx.core.net.toUri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.C
@@ -23,7 +24,6 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
-import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
@@ -34,7 +34,6 @@ import androidx.media3.exoplayer.smoothstreaming.SsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.exoplayer.util.EventLogger
@@ -326,7 +325,7 @@ class ExoPlayerWrapper private constructor(
      * @param url url
      */
     fun playMedia(url: String) {
-        playMedia(Uri.parse(url))
+        playMedia(url.toUri())
     }
 
     /**
@@ -341,7 +340,7 @@ class ExoPlayerWrapper private constructor(
      * @param tag optional tag for Player analytics
      */
     fun playMedia(url: String, tag: Any?) {
-        playMedia(Uri.parse(url), tag)
+        playMedia(url.toUri(), tag)
     }
 
     /**

@@ -2,14 +2,14 @@ plugins {
     id 'com.android.library'
     id 'maven-publish'
     id 'kotlin-android'
-    id "org.jlleitschuh.gradle.ktlint" version "11.3.1"
+    id "org.jlleitschuh.gradle.ktlint" version "13.0.0"
 }
 
 android {
     defaultConfig {
         minSdkVersion 21
-        targetSdk 34
-        compileSdk 34
+        targetSdk 35
+        compileSdk 35
     }
 
     compileOptions {
@@ -30,9 +30,9 @@ android {
     }
 }
 
-def media3Version = '1.4.0'
-def lifecycleVersion = '2.8.4'
-def appCompatVersion = '1.7.0'
+def media3Version = '1.8.0'
+def lifecycleVersion = '2.9.2'
+def appCompatVersion = '1.7.1'
 
 dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
